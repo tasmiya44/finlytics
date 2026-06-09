@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-bg: var(--bg-root);
+  --color-card: var(--bg-card);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  
+  --shadow-polish: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-polish-strong: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+:root {
+  --bg-root: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --primary: #6366F1;
+  --primary-light: #A5B4FC;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  
+  --insight-red-bg: #FEF2F2;
+  --insight-amber-bg: #FFFBEB;
+  --insight-green-bg: #F0FDF4;
+  --insight-blue-bg: #EFF6FF;
+  --insight-text: var(--text-main);
+}
+
+.dark {
+  --bg-root: #0F172A;
+  --bg-card: #1E293B;
+  --primary: #6366F1;
+  --primary-light: #4F46E5;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --text-main: #F1F5F9;
+  --text-muted: #94A3B8;
+  --border: #334155;
+
+  --insight-red-bg: #7F1D1D;
+  --insight-amber-bg: #78350F;
+  --insight-green-bg: #064E3B;
+  --insight-blue-bg: #1E3A8A;
+  --insight-text: #FFFFFF;
+}
+
+@layer base {
+  body {
+    @apply transition-colors duration-300;
+  }
+  
+  *:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+}

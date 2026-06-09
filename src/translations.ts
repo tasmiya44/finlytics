@@ -1,0 +1,205 @@
+
+export const translations: Record<string, Record<string, string>> = {
+  en: {
+    // Sidebar
+    'nav.dashboard': 'Dashboard',
+    'nav.transactions': 'Transactions',
+    'nav.analytics': 'Analytics',
+    'nav.reports': 'Reports',
+    'nav.categories': 'Categories',
+    'nav.settings': 'Settings',
+    'nav.collapse': 'Collapse Menu',
+
+    // TopBar
+    'topbar.search': 'Search records, insights...',
+    'topbar.pro_planner': 'Pro Planner',
+    'topbar.sign_out': 'Sign Out',
+
+    // Dashboard
+    'dashboard.title': 'Financial Dashboard',
+    'dashboard.welcome': 'Welcome back',
+    'dashboard.overview': 'Here\'s your overview.',
+    'dashboard.new_transaction': 'New Transaction',
+    'dashboard.recent_activity': 'Recent Activity',
+    'dashboard.all_logs': 'All Logs',
+    'dashboard.savings_goal': 'Savings Goal',
+    'dashboard.personal_target': 'Personal Target',
+    'dashboard.progress': 'Progress',
+    'dashboard.remaining': 'Remaining',
+    'dashboard.financial_strategy': 'Financial Strategy',
+
+    // Summary
+    'summary.transactions': 'Transactions',
+    'summary.monthly_spend': 'Monthly Spend',
+    'summary.top_category': 'Top Category',
+
+    // Analytics
+    'analytics.title': 'Visual Intelligence',
+    'analytics.subtitle': 'Deep dive into your spending patterns and budgets.',
+    'analytics.adjust_budgets': 'Adjust Budgets',
+    'analytics.monthly_spending': 'Monthly Spending',
+    'analytics.transactions': 'Transactions',
+    'analytics.avg_daily': 'Avg. Daily Outflow',
+    'analytics.spending_core': 'Spending Core',
+    'analytics.dist_percent': 'Category distribution (%)',
+    'analytics.daily_flux': 'Daily Flux (Last 7D)',
+    'analytics.day_outflow': 'Day-by-day outflow',
+    'analytics.monthly_trajectory': 'Monthly Trajectory',
+    'analytics.velocity': 'Spending velocity over time',
+    'analytics.budget_tracking': 'Budget Tracking',
+    'analytics.current_goals': 'Current Month Goals',
+
+    // Categories
+    'categories.title': 'Financial Analysis',
+    'categories.subtitle': 'Explore and analyze your spending distribution across different categories.',
+    'categories.dist_title': 'Spending Distribution',
+    'categories.dist_subtitle': 'Analyze where your money goes',
+    'categories.intel_title': 'Category Intelligence',
+    'categories.intel_subtitle': 'Complete audit of spending by classification',
+    'categories.total_observed': 'Total Observed',
+    'categories.items': 'items',
+    'categories.avg': 'Avg',
+    'categories.aggregate': 'Aggregate',
+    'categories.close_analysis': 'Close Analysis',
+    'categories.this_month': 'This Month',
+    'categories.last_month': 'Last Month',
+    'categories.all_time': 'All Time',
+
+    // Reports
+    'reports.title': 'Financial Reports',
+    'reports.subtitle': 'Generate detailed summaries and export data for your records.',
+    'reports.monthly_summary': 'Monthly Summary',
+    'reports.export_pdf': 'Export PDF',
+    'reports.export_excel': 'Export Excel',
+
+    // Settings
+    'settings.title': 'App Settings',
+    'settings.subtitle': 'Customize your dashboard experience and preferences.',
+    'settings.active_account': 'Active Account',
+    'settings.pro_plan': 'Pro Plan',
+    'settings.sign_out_securely': 'Sign Out Securely',
+    'settings.regional': 'Regional Settings',
+    'settings.currency': 'Preferred Currency',
+    'settings.language': 'System Language',
+    'settings.security': 'Security & Privacy',
+    'settings.two_factor': 'Two-Factor Auth',
+    'settings.email_notifications': 'Email Notifications',
+    'settings.connected_apps': 'Connected Apps',
+    'settings.enabled': 'Enabled',
+    'settings.disabled': 'Disabled',
+    'settings.linked': 'Linked',
+
+    // Common
+    'common.search': 'Search...',
+    'common.loading': 'Loading...',
+    'common.no_data': 'No data available',
+    'common.warning': 'Warning',
+    'common.success': 'Success',
+    'common.error': 'Error',
+    'common.save': 'Save',
+    'common.cancel': 'Cancel',
+    'common.target': 'Target',
+    'common.spent': 'Spent',
+  },
+  hi: {
+    // Sidebar
+    'nav.dashboard': 'डैशबोर्ड',
+    'nav.transactions': 'लेनदेन',
+    'nav.analytics': 'विश्लेषण',
+    'nav.reports': 'रिपोर्ट',
+    'nav.categories': 'श्रेणियाँ',
+    'nav.settings': 'सेटिंग्स',
+    'nav.collapse': 'मेन्यू सिकोड़ें',
+
+    // TopBar
+    'topbar.search': 'रिकॉर्ड, सर्च करें...',
+    'topbar.pro_planner': 'प्रो प्लानर',
+    'topbar.sign_out': 'साइन आउट',
+
+    // Dashboard
+    'dashboard.title': 'वित्तीय डैशबोर्ड',
+    'dashboard.welcome': 'वापसी पर स्वागत है',
+    'dashboard.overview': 'यहाँ आपका अवलोकन है।',
+    'dashboard.new_transaction': 'नया लेनदेन',
+    'dashboard.recent_activity': 'हाल की गतिविधि',
+    'dashboard.all_logs': 'सभी लॉग',
+    'dashboard.savings_goal': 'बचत लक्ष्य',
+    'dashboard.personal_target': 'व्यक्तिगत लक्ष्य',
+    'dashboard.progress': 'प्रगति',
+    'dashboard.remaining': 'शेष',
+    'dashboard.financial_strategy': 'वित्तीय रणनीति',
+
+    // Summary
+    'summary.transactions': 'लेनदेन',
+    'summary.monthly_spend': 'मासिक खर्च',
+    'summary.top_category': 'शीर्ष श्रेणी',
+
+    // Analytics
+    'analytics.title': 'दृश्य बुद्धिमत्ता',
+    'analytics.subtitle': 'अपने खर्च करने के पैटर्न और बजट में गहराई से उतरें।',
+    'analytics.adjust_budgets': 'बजट समायोजित करें',
+    'analytics.monthly_spending': 'मासिक खर्च',
+    'analytics.transactions': 'लेनदेन',
+    'analytics.avg_daily': 'औसत दैनिक बहिर्वाह',
+    'analytics.spending_core': 'खर्च का केंद्र',
+    'analytics.dist_percent': 'श्रेणी वितरण (%)',
+    'analytics.daily_flux': 'दैनिक उतार-चढ़ाव (पिछले 7 दिन)',
+    'analytics.day_outflow': 'दिन-प्रतिदिन का बहिर्वाह',
+    'analytics.monthly_trajectory': 'मासिक प्रक्षेपवक्र',
+    'analytics.velocity': 'समय के साथ खर्च की गति',
+    'analytics.budget_tracking': 'बजट ट्रैकिंग',
+    'analytics.current_goals': 'वर्तमान माह के लक्ष्य',
+
+    // Categories
+    'categories.title': 'वित्तीय विश्लेषण',
+    'categories.subtitle': 'विभिन्न श्रेणियों में अपने खर्च वितरण का अन्वेषण और विश्लेषण करें।',
+    'categories.dist_title': 'खर्च वितरण',
+    'categories.dist_subtitle': 'विश्लेषण करें कि आपका पैसा कहाँ जाता है',
+    'categories.intel_title': 'श्रेणी बुद्धिमत्ता',
+    'categories.intel_subtitle': 'वर्गीकरण के आधार पर खर्च का पूरा ऑडिट',
+    'categories.total_observed': 'कुल देखा गया',
+    'categories.items': 'आइटम',
+    'categories.avg': 'औसत',
+    'categories.aggregate': 'कुल मिलाकर',
+    'categories.close_analysis': 'विश्लेषण बंद करें',
+    'categories.this_month': 'इस महीने',
+    'categories.last_month': 'पिछले महीने',
+    'categories.all_time': 'कुल समय',
+
+    // Reports
+    'reports.title': 'वित्तीय रिपोर्ट',
+    'reports.subtitle': 'विस्तृत सारांश तैयार करें और अपने रिकॉर्ड के लिए डेटा निर्यात करें।',
+    'reports.monthly_summary': 'मासिक सारांश',
+    'reports.export_pdf': 'पीडीएफ निर्यात करें',
+    'reports.export_excel': 'एक्सेल निर्यात करें',
+
+    // Settings
+    'settings.title': 'ऐप सेटिंग्स',
+    'settings.subtitle': 'अपने डैशबोर्ड के अनुभव और प्राथमिकताओं को अनुकूलित करें।',
+    'settings.active_account': 'सक्रिय खाता',
+    'settings.pro_plan': 'प्रो प्लान',
+    'settings.sign_out_securely': 'सुरक्षित रूप से साइन आउट करें',
+    'settings.regional': 'क्षेत्रीय सेटिंग्स',
+    'settings.currency': 'पसंदीदा मुद्रा',
+    'settings.language': 'सिस्टम भाषा',
+    'settings.security': 'सुरक्षा और गोपनीयता',
+    'settings.two_factor': 'टू-फैक्टर ऑथेंटिकेशन',
+    'settings.email_notifications': 'ईमेल सूचनाएं',
+    'settings.connected_apps': 'जुड़े हुए ऐप्स',
+    'settings.enabled': 'सक्षम',
+    'settings.disabled': 'अक्षम',
+    'settings.linked': 'जुड़े हुए',
+
+    // Common
+    'common.search': 'खोजें...',
+    'common.loading': 'लोड हो रहा है...',
+    'common.no_data': 'कोई डेटा उपलब्ध नहीं है',
+    'common.warning': 'चेतावनी',
+    'common.success': 'सफलता',
+    'common.error': 'त्रुटि',
+    'common.save': 'सहेजें',
+    'common.cancel': 'रद्द करें',
+    'common.target': 'लक्ष्य',
+    'common.spent': 'खर्च किया',
+  }
+};
