@@ -123,7 +123,7 @@ export default function Login({ onLogin }: LoginProps) {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full bg-bg border border-border rounded-xl pl-12 pr-4 py-3.5 font-medium text-text-main outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all placeholder:text-text-muted/30 text-sm"
-                      placeholder="John Doe"
+                      placeholder="Full Name"
                     />
                   </div>
                 </motion.div>
@@ -144,7 +144,7 @@ export default function Login({ onLogin }: LoginProps) {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full bg-bg border border-border rounded-xl pl-12 pr-4 py-3.5 font-medium text-text-main outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all placeholder:text-text-muted/30 text-sm"
-                  placeholder="Tasmiya or name@example.com"
+                  placeholder="Name or name@example.com"
                 />
               </div>
             </div>
