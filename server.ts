@@ -10,7 +10,7 @@ import multer from 'multer';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import cors from 'cors';
-import { initDb } from './src/server/db';
+import { initDb } from './src/server/db.ts';
 
 interface User {
   id: number;
@@ -67,7 +67,7 @@ async function startServer() {
         console.warn('\x1b[33m%s\x1b[0m', '  2. FRONTEND_URL = your actual frontend domain (e.g. https://your-vercel-app.vercel.app)');
         console.warn('\x1b[31m%s\x1b[0m', '---------------------------------------------------------');
         
-        // Auto-fix DB URL for safety
+        
         if (!process.env.DATABASE_URL) {
           process.env.DATABASE_URL = rawFrontendUrl;
         }
