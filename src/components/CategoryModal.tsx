@@ -33,23 +33,23 @@ export default function CategoryModal({ onClose, onSuccess }: CategoryModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="bg-card w-full max-w-md rounded-[2.5rem] border border-border shadow-2xl p-8 relative overflow-hidden"
+        className="bg-card w-full max-w-md rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-2xl p-5 sm:p-8 relative overflow-hidden max-h-[92vh] overflow-y-auto"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex items-center justify-between mb-8 relative z-10">
-          <div className="flex items-center gap-3">
+        <div className="flex items-start justify-between gap-4 mb-6 sm:mb-8 relative z-10">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
               <Tag size={20} className="text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-lg font-black text-text-main tracking-tight">Create Category</h2>
-              <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest leading-none mt-1">New Classification</p>
+              <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest leading-tight mt-1">New Classification</p>
             </div>
           </div>
           <button 
@@ -86,18 +86,18 @@ export default function CategoryModal({ onClose, onSuccess }: CategoryModalProps
             )}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-4 bg-bg border border-border/60 text-text-main rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all hover:bg-border/20 active:scale-[0.98]"
+              className="flex-1 py-4 bg-bg border border-border/60 text-text-main rounded-2xl font-black text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all hover:bg-border/20 active:scale-[0.98]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.2em] shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

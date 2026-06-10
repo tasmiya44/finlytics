@@ -98,25 +98,25 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
   };
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 sm:space-y-8 pb-12 min-w-0">
       {/* Analytics Header & Controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
             <PieIcon size={24} />
           </div>
-          <div>
-            <h2 className="text-xl font-black text-text-main dark:text-white tracking-tight">{t('categories.dist_title')}</h2>
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-black text-text-main dark:text-white tracking-tight">{t('categories.dist_title')}</h2>
             <p className="text-xs font-bold text-text-muted uppercase tracking-widest opacity-60">{t('categories.dist_subtitle')}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-bg dark:bg-slate-900/50 p-1.5 rounded-2xl border border-border/50">
+        <div className="w-full md:w-auto flex flex-wrap items-center gap-2 bg-bg dark:bg-slate-900/50 p-1.5 rounded-2xl border border-border/50">
           {TIME_FILTERS.map(f => (
             <button
               key={f.id}
               onClick={() => setTimeFilter(f.id)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              className={`flex-1 md:flex-none px-3 sm:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                 timeFilter === f.id 
                   ? 'bg-card text-primary shadow-sm border border-border/50' 
                   : 'text-text-muted hover:text-text-main'
@@ -130,19 +130,19 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
 
       <div className="grid grid-cols-1 gap-8 items-start">
         {/* Categories Analysis List */}
-        <div className="bg-card rounded-[2.5rem] border border-border shadow-soft p-10">
-          <div className="flex items-center justify-between mb-12">
+        <div className="bg-card rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-soft p-5 sm:p-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 sm:mb-12 gap-4">
             <div>
               <h3 className="text-xl font-black text-text-main dark:text-white uppercase tracking-tight">{t('categories.intel_title')}</h3>
               <p className="text-xs font-bold text-text-muted italic opacity-60">{t('categories.intel_subtitle')}</p>
             </div>
-            <div className="text-right">
+            <div className="sm:text-right">
               <p className="text-[10px] font-black text-text-muted uppercase tracking-widest leading-tight">{t('categories.total_observed')}</p>
               <p className="text-2xl font-black text-primary">{formatAmount(totalSpent)}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {categoryData.length > 0 ? (
               categoryData.map((item, index) => (
                 <motion.div
@@ -153,17 +153,17 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                   onClick={() => setSelectedCategory(item.name)}
                   className="group cursor-pointer"
                 >
-                  <div className="flex items-center justify-between p-6 bg-bg dark:bg-slate-900/40 rounded-[2rem] border border-border/40 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
-                    <div className="flex items-center gap-5 flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 sm:p-6 bg-bg dark:bg-slate-900/40 rounded-[1.75rem] sm:rounded-[2rem] border border-border/40 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 gap-5">
+                    <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
                       <div 
                         className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black shadow-lg shadow-primary/10 group-hover:scale-110 transition-transform"
                         style={{ backgroundColor: CATEGORY_COLORS[item.name] || '#64748B' }}
                       >
                         {item.name.charAt(0)}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-base font-black text-text-main dark:text-white tracking-tight">{item.name}</h4>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <h4 className="text-base font-black text-text-main dark:text-white tracking-tight truncate">{item.name}</h4>
                           <span className="text-[11px] font-black text-primary uppercase tracking-widest">{item.percentage.toFixed(1)}%</span>
                         </div>
                         
@@ -177,7 +177,7 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                           />
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                           <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{item.count} {t('categories.items')}</span>
                           <span className="w-1 h-1 bg-border rounded-full" />
                           <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{t('categories.avg')} {formatAmount(item.value / item.count).split('.')[0]}</span>
@@ -185,7 +185,7 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                       </div>
                     </div>
                     
-                    <div className="text-right pl-6 border-l border-border/50 ml-6 min-w-[130px]">
+                    <div className="w-full sm:w-auto sm:text-right sm:pl-6 sm:border-l border-border/50 sm:ml-6 sm:min-w-[130px]">
                       <p className="text-xl font-black text-text-main dark:text-white leading-none mb-1">{formatAmount(item.value)}</p>
                       <p className="text-[10px] font-black text-text-muted uppercase tracking-widest opacity-50">{t('categories.aggregate')}</p>
                     </div>
@@ -193,7 +193,7 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-2 py-24 text-center border-2 border-dashed border-border rounded-[2.5rem]">
+              <div className="md:col-span-2 py-16 sm:py-24 text-center border-2 border-dashed border-border rounded-[2rem] sm:rounded-[2.5rem]">
                 <div className="w-20 h-20 bg-bg dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
                   <PieIcon className="text-text-muted opacity-20" size={32} />
                 </div>
@@ -207,7 +207,7 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
       {/* Transaction Modal (Matches the Look of Reports but focused on analysis) */}
       <AnimatePresence>
         {selectedCategory && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -219,10 +219,10 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-card dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-border shadow-2xl relative overflow-hidden flex flex-col max-h-[85vh]"
+              className="bg-card dark:bg-slate-900 w-full max-w-2xl rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh]"
             >
-              <div className="p-8 border-b border-border/50 flex justify-between items-center bg-card sticky top-0 z-10">
-                <div className="flex items-center gap-4">
+              <div className="p-5 sm:p-8 border-b border-border/50 flex justify-between items-center gap-4 bg-card sticky top-0 z-10">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                   <div 
                     className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary/20"
                     style={{ backgroundColor: CATEGORY_COLORS[selectedCategory] || '#64748B' }}
@@ -230,7 +230,7 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                     <TableIcon size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-text-main dark:text-white tracking-tight">{selectedCategory} Breakdown</h3>
+                    <h3 className="text-lg sm:text-xl font-black text-text-main dark:text-white tracking-tight truncate">{selectedCategory} Breakdown</h3>
                     <p className="text-xs font-bold text-text-muted uppercase tracking-widest opacity-60">
                       {filteredData.filter(e => e.category === selectedCategory).length} transactions recorded
                     </p>
@@ -244,18 +244,18 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 thin-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 thin-scrollbar">
                 {filteredData
                   .filter(e => e.category === selectedCategory)
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .map((exp) => (
-                    <div key={exp.id} className="p-5 bg-bg dark:bg-slate-950/20 rounded-2xl border border-border/30 flex items-center justify-between group hover:border-primary/20 transition-all">
-                      <div className="flex items-center gap-4">
+                    <div key={exp.id} className="p-4 sm:p-5 bg-bg dark:bg-slate-950/20 rounded-2xl border border-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group hover:border-primary/20 transition-all">
+                      <div className="flex items-center gap-4 min-w-0">
                         <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center text-text-muted group-hover:bg-primary/5 group-hover:text-primary transition-all shadow-sm">
                           <FileText size={18} />
                         </div>
-                        <div>
-                          <p className="text-sm font-extrabold text-text-main dark:text-white leading-tight mb-1">{exp.description}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-extrabold text-text-main dark:text-white leading-tight mb-1 truncate">{exp.description}</p>
                           <div className="flex items-center gap-2">
                             <p className="text-[10px] font-bold text-text-muted uppercase tracking-tight">
                               {new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short' }).format(new Date(exp.date))}
@@ -267,15 +267,15 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
                           </div>
                         </div>
                       </div>
-                      <p className="text-base font-black text-text-main dark:text-white">{formatAmount(exp.amount)}</p>
+                      <p className="text-base font-black text-text-main dark:text-white sm:text-right">{formatAmount(exp.amount)}</p>
                     </div>
                   ))}
               </div>
 
-              <div className="p-6 border-t border-border/50 bg-bg/30 text-center uppercase tracking-[0.2em]">
+              <div className="p-4 sm:p-6 border-t border-border/50 bg-bg/30 text-center uppercase tracking-[0.2em]">
                 <button 
                   onClick={() => setSelectedCategory(null)}
-                  className="px-8 py-4 bg-text-main dark:bg-white text-bg dark:text-text-main text-[10px] font-black rounded-xl hover:opacity-90 transition-all"
+                  className="w-full sm:w-auto px-8 py-4 bg-text-main dark:bg-white text-bg dark:text-text-main text-[10px] font-black rounded-xl hover:opacity-90 transition-all"
                 >
                   {t('categories.close_analysis')}
                 </button>

@@ -147,15 +147,15 @@ export default function Reports({ userId }: ReportsProps) {
   };
 
   return (
-    <div className="mt-8 space-y-8 pb-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-8 bg-card rounded-[2.5rem] border border-border shadow-soft">
-        <div className="flex items-center gap-4">
+    <div className="mt-6 sm:mt-8 space-y-6 sm:space-y-8 pb-12 min-w-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-5 sm:p-8 bg-card rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-soft">
+        <div className="flex items-center gap-4 min-w-0">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
             <Calendar size={24} className="text-primary" />
           </div>
 
-          <div>
-            <h2 className="text-xl font-black text-text-main dark:text-white tracking-tight">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-black text-text-main dark:text-white tracking-tight">
               Financial Reports
             </h2>
             <p className="text-[10px] font-bold text-text-muted uppercase tracking-[0.3em] opacity-60">
@@ -164,11 +164,11 @@ export default function Reports({ userId }: ReportsProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 bg-bg dark:bg-slate-900/50 p-2 rounded-2xl border border-border/50">
+        <div className="w-full md:w-auto flex flex-wrap items-center gap-3 sm:gap-4 bg-bg dark:bg-slate-900/50 p-2 rounded-2xl border border-border/50">
           <select
             value={selectedMonth}
             onChange={e => setSelectedMonth(parseInt(e.target.value))}
-            className="bg-card px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-text-main dark:text-white border border-border/50 focus:outline-none cursor-pointer hover:bg-bg transition-colors"
+            className="flex-1 min-w-[140px] bg-card px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-text-main dark:text-white border border-border/50 focus:outline-none cursor-pointer hover:bg-bg transition-colors"
           >
             {MONTHS.map((m, i) => (
               <option key={m} value={i}>
@@ -180,7 +180,7 @@ export default function Reports({ userId }: ReportsProps) {
           <select
             value={selectedYear}
             onChange={e => setSelectedYear(parseInt(e.target.value))}
-            className="bg-card px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-text-main dark:text-white border border-border/50 focus:outline-none cursor-pointer hover:bg-bg transition-colors"
+            className="flex-1 min-w-[100px] bg-card px-4 sm:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-text-main dark:text-white border border-border/50 focus:outline-none cursor-pointer hover:bg-bg transition-colors"
           >
             {[2024, 2025, 2026].map(y => (
               <option key={y} value={y}>
@@ -189,9 +189,9 @@ export default function Reports({ userId }: ReportsProps) {
             ))}
           </select>
 
-          <div className="h-8 w-px bg-border mx-2" />
+          <div className="hidden sm:block h-8 w-px bg-border mx-2" />
 
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 px-2 sm:px-4">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">
               Live Audit
@@ -201,17 +201,17 @@ export default function Reports({ userId }: ReportsProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-6 sm:space-y-8 min-w-0">
           {loading ? (
-            <div className="h-[400px] flex items-center justify-center bg-card rounded-[2.5rem] border border-dashed border-border">
+            <div className="h-[320px] sm:h-[400px] flex items-center justify-center bg-card rounded-[2rem] sm:rounded-[2.5rem] border border-dashed border-border">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
           ) : reportData && reportData.transactionCount > 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-              <div className="bg-card p-12 rounded-[2.5rem] border border-border shadow-polish relative overflow-hidden">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 sm:space-y-8">
+              <div className="bg-card p-5 sm:p-8 xl:p-12 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 -mr-40 -mt-40 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 sm:gap-8 mb-10 sm:mb-16">
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="w-8 h-px bg-primary" />
@@ -220,7 +220,7 @@ export default function Reports({ userId }: ReportsProps) {
                       </span>
                     </div>
 
-                    <h3 className="text-3xl font-black text-text-main dark:text-white tracking-tight leading-none mb-2">
+                    <h3 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight leading-tight mb-2">
                       Monthly Ledger
                     </h3>
 
@@ -229,17 +229,17 @@ export default function Reports({ userId }: ReportsProps) {
                     </p>
                   </div>
 
-                  <div className="text-right p-6 bg-bg dark:bg-slate-950/20 rounded-3xl border border-border/50">
+                  <div className="w-full md:w-auto text-left md:text-right p-5 sm:p-6 bg-bg dark:bg-slate-950/20 rounded-3xl border border-border/50">
                     <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-2 opacity-60">
                       Statement Total
                     </p>
-                    <p className="text-4xl font-black text-text-main dark:text-white leading-none tracking-tight">
+                    <p className="text-2xl sm:text-4xl font-black text-text-main dark:text-white leading-tight tracking-tight break-words">
                       {formatAmount(Number(reportData.totalSpent || 0))}
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 relative z-10 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12 relative z-10 mb-10 sm:mb-12">
                   <div className="space-y-2">
                     <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] leading-none opacity-60">
                       Reconciled Items
@@ -278,7 +278,7 @@ export default function Reports({ userId }: ReportsProps) {
                   </div>
                 </div>
 
-                <div className="relative z-10 mt-12 pt-12 border-t border-border/50">
+                <div className="relative z-10 mt-10 sm:mt-12 pt-10 sm:pt-12 border-t border-border/50">
                   <h4 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mb-6">
                     Expenditure Audit Table
                   </h4>
@@ -287,7 +287,7 @@ export default function Reports({ userId }: ReportsProps) {
                     {Object.entries(reportData.categoryBreakdown || {}).map(([cat, amt]) => (
                       <div
                         key={cat}
-                        className="flex items-center justify-between py-3 border-b border-border/20 last:border-0 group"
+                        className="flex items-center justify-between gap-4 py-3 border-b border-border/20 last:border-0 group"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity" />
@@ -295,7 +295,7 @@ export default function Reports({ userId }: ReportsProps) {
                             {cat}
                           </span>
                         </div>
-                        <span className="text-[13px] font-black text-text-main dark:text-white">
+                        <span className="text-[13px] font-black text-text-main dark:text-white text-right shrink-0">
                           {formatAmount(Number(amt || 0))}
                         </span>
                       </div>
@@ -303,7 +303,7 @@ export default function Reports({ userId }: ReportsProps) {
                   </div>
                 </div>
 
-                <div className="mt-12 p-8 bg-primary/5 rounded-[2rem] border border-primary/10 flex items-start gap-6">
+                <div className="mt-10 sm:mt-12 p-5 sm:p-8 bg-primary/5 rounded-[2rem] border border-primary/10 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                   <div className="w-12 h-12 bg-primary rounded-2xl text-white flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
                     <FileText size={20} />
                   </div>
@@ -319,8 +319,8 @@ export default function Reports({ userId }: ReportsProps) {
                 </div>
               </div>
 
-              <div className="bg-card p-12 rounded-[2.5rem] border border-border shadow-polish">
-                <div className="flex items-center justify-between mb-12">
+              <div className="bg-card p-5 sm:p-8 xl:p-12 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish">
+                <div className="flex items-center justify-between mb-8 sm:mb-12 gap-4">
                   <div>
                     <h3 className="text-xl font-black text-text-main dark:text-white uppercase tracking-tight leading-none mb-1">
                       Budget Reconciliation
@@ -335,8 +335,8 @@ export default function Reports({ userId }: ReportsProps) {
 
                 <div className="space-y-6">
                   {reportData.budgetStatus.length > 0 ? (
-                    <div className="bg-bg dark:bg-slate-950/20 rounded-3xl border border-border/50 overflow-hidden">
-                      <table className="w-full text-left">
+                    <div className="bg-bg dark:bg-slate-950/20 rounded-3xl border border-border/50 overflow-x-auto">
+                      <table className="w-full min-w-[640px] text-left">
                         <thead>
                           <tr className="bg-bg dark:bg-slate-900 border-b border-border/50">
                             <th className="px-6 py-4 text-[10px] font-black text-text-muted uppercase tracking-widest">
@@ -408,12 +408,12 @@ export default function Reports({ userId }: ReportsProps) {
               </div>
             </motion.div>
           ) : (
-            <div className="h-[400px] flex flex-col items-center justify-center text-center bg-card rounded-[2.5rem] border border-dashed border-border gap-6">
+            <div className="min-h-[320px] sm:h-[400px] flex flex-col items-center justify-center text-center bg-card rounded-[2rem] sm:rounded-[2.5rem] border border-dashed border-border gap-6 p-6">
               <div className="w-20 h-20 bg-bg dark:bg-slate-900 rounded-full flex items-center justify-center scale-110">
                 <FileText size={40} className="text-text-muted opacity-20" />
               </div>
 
-              <p className="text-text-muted font-bold px-12 text-sm leading-relaxed max-w-sm uppercase tracking-widest">
+              <p className="text-text-muted font-bold sm:px-12 text-sm leading-relaxed max-w-sm uppercase tracking-widest">
                 Official statement unavailable for{' '}
                 <span className="text-primary">
                   {MONTHS[selectedMonth]} {selectedYear}
@@ -425,7 +425,7 @@ export default function Reports({ userId }: ReportsProps) {
         </div>
 
         <div className="lg:col-span-4 space-y-6">
-          <div className="p-8 bg-card rounded-[2.5rem] border border-border shadow-soft flex flex-col items-center text-center">
+          <div className="p-6 sm:p-8 bg-card rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-soft flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
               <Download size={32} />
             </div>
@@ -483,7 +483,7 @@ export default function Reports({ userId }: ReportsProps) {
             </div>
           </div>
 
-          <div className="p-8 bg-primary text-white rounded-[2.5rem] shadow-xl shadow-primary/20 relative overflow-hidden group">
+          <div className="p-6 sm:p-8 bg-primary text-white rounded-[2rem] sm:rounded-[2.5rem] shadow-xl shadow-primary/20 relative overflow-hidden group">
             <div className="relative z-10">
               <h4 className="text-sm font-black uppercase tracking-widest mb-4">
                 Pro Insight

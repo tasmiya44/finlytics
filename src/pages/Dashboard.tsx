@@ -82,15 +82,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full min-w-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-text-main dark:text-white tracking-tight">{t('dashboard.title')}</h1>
-          <p className="text-text-muted font-medium">{t('dashboard.welcome')}, {user.name}! {t('dashboard.overview')}</p>
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight">{t('dashboard.title')}</h1>
+          <p className="text-sm sm:text-base text-text-muted font-medium break-words">{t('dashboard.welcome')}, {user.name}! {t('dashboard.overview')}</p>
         </div>
         <Link
           to="/transactions"
-          className="flex items-center gap-2 bg-primary text-white font-black py-3 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] transition-all active:scale-[0.98]"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white font-black py-3 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] transition-all active:scale-[0.98]"
         >
           <Plus size={18} />
           {t('dashboard.new_transaction')}
@@ -103,18 +103,18 @@ export default function Dashboard() {
         <div className="lg:col-span-8 space-y-8">
           <SmartInsights userId={user.id} expensesCount={expenses.length} />
 
-          <div className="bg-card p-8 rounded-[2rem] border border-border shadow-polish relative overflow-hidden group/recent">
+          <div className="bg-card p-4 sm:p-8 rounded-[1.75rem] sm:rounded-[2rem] border border-border shadow-polish relative overflow-hidden group/recent">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full group-hover/recent:scale-110 transition-transform blur-2xl" />
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 relative z-10 gap-4">
-              <div className="flex items-center gap-4">
-                <h3 className="text-xl font-black text-text-main dark:text-white flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 min-w-0">
+                <h3 className="text-lg sm:text-xl font-black text-text-main dark:text-white flex items-center gap-3 min-w-0">
                   <div className="p-2.5 bg-primary/10 rounded-xl text-primary shadow-sm">
                     <TrendingUp size={22} />
                   </div>
-                  {t('dashboard.recent_activity')}
+                  <span className="truncate">{t('dashboard.recent_activity')}</span>
                 </h3>
-                <div className="px-3 py-1 bg-primary/5 rounded-lg border border-primary/10">
+                <div className="w-fit px-3 py-1 bg-primary/5 rounded-lg border border-primary/10">
                   <span className="text-[9px] font-black uppercase tracking-widest text-primary opacity-80">This Month</span>
                 </div>
               </div>
@@ -136,7 +136,7 @@ export default function Dashboard() {
                 <div className="flex justify-center pt-4 border-t border-border/40">
                   <button
                     onClick={() => setShowAllThisMonth(!showAllThisMonth)}
-                    className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all active:scale-[0.98]"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 sm:px-8 py-3 bg-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all active:scale-[0.98]"
                   >
                     {showAllThisMonth ? 'View Fewer Logs' : `View All This Month (${currentMonthExpenses.length})`}
                     <ArrowRight size={14} className={`transition-transform ${showAllThisMonth ? '-rotate-90' : 'rotate-90'}`} />
@@ -155,7 +155,7 @@ export default function Dashboard() {
               onOpenSettings={() => setIsBudgetSettingsOpen(true)}
             />
 
-            <div className="bg-gradient-to-br from-primary to-primary-light p-8 rounded-[2.5rem] text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-primary to-primary-light p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -192,7 +192,7 @@ export default function Dashboard() {
           </div>
 
           {/* New Monthly Tip Section to fill the empty space */}
-          <div className="bg-card p-8 rounded-[2.5rem] border border-border shadow-polish group hover:border-primary/20 transition-all">
+          <div className="bg-card p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish group hover:border-primary/20 transition-all">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center text-success group-hover:bg-success group-hover:text-white transition-all shadow-sm">
                 <TrendingUp size={18} />
@@ -208,7 +208,7 @@ export default function Dashboard() {
 
       <AnimatePresence>
         {isBudgetSettingsOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -220,7 +220,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-md"
+              className="relative w-full max-w-md max-h-[92vh] overflow-y-auto"
             >
               <BudgetSettings
                 currentBudgets={budgets}
@@ -233,7 +233,7 @@ export default function Dashboard() {
         )}
 
         {isExpenseFormOpen && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -248,7 +248,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl bg-card rounded-[2.5rem] overflow-hidden shadow-2xl"
+              className="relative w-full max-w-2xl max-h-[92vh] bg-card rounded-[2rem] sm:rounded-[2.5rem] overflow-y-auto shadow-2xl"
             >
               <ExpenseForm
                 onAddExpense={(data) => {

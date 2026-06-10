@@ -18,11 +18,16 @@ import {
   Settings,
   Tag,
   CreditCard,
-  ArrowRight
+  ArrowRight,
+  Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-export default function TopBar() {
+interface TopBarProps {
+  onMenuClick: () => void;
+}
+
+export default function TopBar({ onMenuClick }: TopBarProps) {
   const { user, expenses, categories, logout, t, notifications } = useApp();
   const navigate = useNavigate();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -132,8 +137,15 @@ export default function TopBar() {
   };
 
   return (
-    <header className="h-20 bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-40 px-8 flex items-center justify-between">
-      <div className="flex items-center gap-4 flex-1">
+    <header className="h-16 sm:h-20 bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-40 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden w-10 h-10 rounded-xl bg-bg border border-border text-text-main flex items-center justify-center shadow-sm active:scale-95 transition-all"
+          aria-label="Open navigation menu"
+        >
+          <Menu size={20} />
+        </button>
         <div className="relative max-w-md w-full hidden sm:block" ref={searchRef}>
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${isSearchFocused ? 'text-primary' : 'text-text-muted'}`} size={18} />
           <input 
@@ -146,7 +158,7 @@ export default function TopBar() {
             }}
             onFocus={() => setIsSearchFocused(true)}
             onKeyDown={handleSearchKeyDown}
-            className="w-full bg-bg dark:bg-slate-900 border border-border rounded-xl pl-10 pr-4 py-2 text-sm font-medium focus:outline-none focus:border-primary transition-all pr-12"
+            className="w-full bg-bg dark:bg-slate-900 border border-border rounded-xl pl-10 pr-12 py-2 text-sm font-medium focus:outline-none focus:border-primary transition-all"
           />
           
           <AnimatePresence>
@@ -190,7 +202,7 @@ export default function TopBar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         <ThemeToggle />
         
         <div className="relative" ref={notificationRef}>
@@ -210,7 +222,7 @@ export default function TopBar() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute right-0 mt-3 w-80 bg-card border border-border rounded-2xl shadow-polish-strong overflow-hidden z-50"
+                className="absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-80 bg-card border border-border rounded-2xl shadow-polish-strong overflow-hidden z-50"
               >
                 <div className="p-4 border-b border-border bg-bg/50">
                   <h3 className="text-xs font-black text-text-main dark:text-white uppercase tracking-widest">Notifications</h3>
@@ -249,7 +261,7 @@ export default function TopBar() {
           </AnimatePresence>
         </div>
 
-        <div className="h-8 w-[1px] bg-border mx-2" />
+        <div className="hidden sm:block h-8 w-[1px] bg-border mx-2" />
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">

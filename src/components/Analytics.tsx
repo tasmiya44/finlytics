@@ -99,34 +99,34 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
   ];
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-6 sm:space-y-8 pb-12 min-w-0">
       {/* Overview Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {metrics.map((m, i) => (
           <motion.div
             key={m.label}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-card p-6 rounded-[2rem] border border-border shadow-soft flex items-center gap-5"
+            className="bg-card p-5 sm:p-6 rounded-[1.75rem] sm:rounded-[2rem] border border-border shadow-soft flex items-center gap-4 sm:gap-5 min-w-0"
           >
             <div className={`w-12 h-12 rounded-xl ${m.bg} ${m.color} flex items-center justify-center`}>
               {m.icon}
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-0.5">{m.label}</p>
-              <p className="text-xl font-black text-text-main dark:text-white tracking-tight">{m.value}</p>
+              <p className="text-lg sm:text-xl font-black text-text-main dark:text-white tracking-tight truncate">{m.value}</p>
             </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Pie Chart: Category Breakdown */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-card p-8 rounded-[2.5rem] border border-border shadow-polish flex flex-col h-[450px]"
+          className="bg-card p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish flex flex-col h-[360px] sm:h-[450px] min-w-0"
         >
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
@@ -138,15 +138,15 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
             </div>
           </div>
           
-          <div className="flex-grow">
+          <div className="flex-grow min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={pieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={70}
-                  outerRadius={110}
+                  innerRadius="45%"
+                  outerRadius="70%"
                   paddingAngle={5}
                   dataKey="value"
                   labelLine={false}
@@ -172,7 +172,7 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 mt-4 pt-6 border-t border-border/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-2 mt-3 sm:mt-4 pt-4 sm:pt-6 border-t border-border/50">
             {pieData.slice(0, 4).map((entry) => (
                 <div key={entry.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-card p-8 rounded-[2.5rem] border border-border shadow-polish flex flex-col h-[450px]"
+          className="bg-card p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish flex flex-col h-[360px] sm:h-[450px] min-w-0"
         >
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500">
@@ -201,7 +201,7 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
               <p className="text-[10px] font-bold text-text-muted italic uppercase tracking-widest opacity-60">{t('analytics.day_outflow')}</p>
             </div>
           </div>
-          <div className="flex-grow">
+          <div className="flex-grow min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData}>
                 <YAxis hide domain={[0, 'dataMax']} />
@@ -216,7 +216,7 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
                   formatter={(value: number) => [formatAmount(value), 'Spent']}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', fontSize: '10px' }}
                 />
-                <Bar dataKey="amount" fill="#6366F1" radius={[6, 6, 6, 6]} barSize={32} minPointSize={4} />
+                <Bar dataKey="amount" fill="#6366F1" radius={[6, 6, 6, 6]} barSize={24} minPointSize={4} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -227,20 +227,20 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-2 bg-card p-10 rounded-[2.5rem] border border-border shadow-polish h-[450px]"
+          className="lg:col-span-2 bg-card p-5 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish h-[360px] sm:h-[450px] min-w-0"
         >
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm shrink-0">
                 <TrendingUp size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-black text-text-main dark:text-white uppercase tracking-tight">{t('analytics.monthly_trajectory')}</h3>
+                <h3 className="text-lg sm:text-xl font-black text-text-main dark:text-white uppercase tracking-tight">{t('analytics.monthly_trajectory')}</h3>
                 <p className="text-[10px] font-bold text-text-muted italic uppercase tracking-[0.2em] opacity-60">{t('analytics.velocity')}</p>
               </div>
             </div>
           </div>
-          <div className="h-[280px]">
+          <div className="h-[240px] sm:h-[280px] min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyTrendData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
@@ -266,8 +266,8 @@ export default function Analytics({ expenses }: { expenses: any[] }) {
                   type="monotone" 
                   dataKey="amount" 
                   stroke="#6366F1" 
-                  strokeWidth={5} 
-                  dot={{ r: 6, strokeWidth: 3, fill: 'white', stroke: '#6366F1' }}
+                  strokeWidth={4} 
+                  dot={{ r: 5, strokeWidth: 3, fill: 'white', stroke: '#6366F1' }}
                   activeDot={{ r: 8, strokeWidth: 0, fill: '#6366F1' }}
                 />
               </LineChart>

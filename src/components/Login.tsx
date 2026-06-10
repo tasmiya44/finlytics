@@ -80,14 +80,14 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-bg flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 dark:opacity-10">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px]" />
       </div>
 
-      <div className="absolute top-8 right-8">
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
         <ThemeToggle />
       </div>
 
@@ -96,31 +96,31 @@ export default function Login({ onLogin }: LoginProps) {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-[440px] w-full relative z-10"
       >
-        <div className="text-center mb-10">
+        <div className="text-center mb-8 sm:mb-10">
           <motion.div 
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            className="inline-block bg-primary p-4 rounded-[22px] shadow-lg shadow-primary/30 mb-6"
+            className="inline-block bg-primary p-3.5 sm:p-4 rounded-[20px] sm:rounded-[22px] shadow-lg shadow-primary/30 mb-5 sm:mb-6"
           >
-            <Wallet className="text-white" size={36} />
+            <Wallet className="text-white" size={32} />
           </motion.div>
-          <h1 className="text-3xl font-extrabold text-text-main tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight leading-tight px-2">
             {isLogin ? 'Welcome to Finlytics' : 'Create your Finlytics account'}
           </h1>
-          <p className="text-text-muted font-medium mt-2">Manage your finances with clarity and precision</p>
+          <p className="text-sm sm:text-base text-text-muted font-medium mt-2 px-4">Manage your finances with clarity and precision</p>
         </div>
 
-        <div className="bg-card p-10 rounded-[2.5rem] border border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
-          <div className="flex bg-bg p-1.5 rounded-2xl mb-8 border border-border">
+        <div className="bg-card p-5 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+          <div className="flex bg-bg p-1.5 rounded-2xl mb-6 sm:mb-8 border border-border">
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all text-sm uppercase tracking-wider ${isLogin ? 'bg-card shadow-sm text-text-main' : 'text-text-muted hover:text-text-main'}`}
+              className={`flex-1 py-3 rounded-xl font-bold transition-all text-xs sm:text-sm uppercase tracking-wider ${isLogin ? 'bg-card shadow-sm text-text-main' : 'text-text-muted hover:text-text-main'}`}
             >
               Login
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all text-sm uppercase tracking-wider ${!isLogin ? 'bg-card shadow-sm text-text-main' : 'text-text-muted hover:text-text-main'}`}
+              className={`flex-1 py-3 rounded-xl font-bold transition-all text-xs sm:text-sm uppercase tracking-wider ${!isLogin ? 'bg-card shadow-sm text-text-main' : 'text-text-muted hover:text-text-main'}`}
             >
               Register
             </button>
@@ -219,13 +219,13 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={loading || demoLoading}
-              className="w-full bg-primary text-white py-4.5 rounded-2xl font-extrabold text-[16px] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-50 mt-4 cursor-pointer"
+              className="w-full bg-primary text-white py-4.5 rounded-2xl font-extrabold text-sm sm:text-[16px] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-50 mt-4 cursor-pointer"
             >
               {loading ? (
                 <div className="h-6 w-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span className="uppercase tracking-widest">{isLogin ? 'Login' : 'Begin Journey'}</span>
+                  <span className="uppercase tracking-[0.16em] sm:tracking-widest">{isLogin ? 'Login' : 'Begin Journey'}</span>
                   <ArrowRight size={20} />
                 </>
               )}
@@ -237,21 +237,21 @@ export default function Login({ onLogin }: LoginProps) {
               type="button"
               onClick={handleDemoLogin}
               disabled={loading || demoLoading}
-              className="w-full mt-4 bg-bg text-text-main py-4 rounded-2xl font-extrabold text-sm border border-border flex items-center justify-center gap-3 transition-all hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full mt-4 bg-bg text-text-main py-4 rounded-2xl font-extrabold text-xs sm:text-sm border border-border flex items-center justify-center gap-3 transition-all hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {demoLoading ? (
                 <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
                   <PlayCircle size={20} />
-                  <span className="uppercase tracking-widest">Continue as Demo User</span>
+                  <span className="uppercase tracking-[0.12em] sm:tracking-widest">Continue as Demo User</span>
                 </>
               )}
             </button>
           )}
         </div>
 
-        <div className="text-center mt-12 space-y-4">
+        <div className="text-center mt-8 sm:mt-12 space-y-4">
           <p className="text-text-muted font-bold text-[10px] uppercase tracking-[0.2em] opacity-40">
             Secure • Private • Encrypted
           </p>

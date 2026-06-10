@@ -44,7 +44,7 @@ export default function BudgetOverview({
 
   if (budgetStats.length === 0) {
     return (
-      <div className="bg-card p-10 rounded-[2.5rem] border border-border shadow-polish mb-8 text-center">
+      <div className="bg-card p-5 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish mb-6 sm:mb-8 text-center">
         <div className="w-16 h-16 bg-bg rounded-full flex items-center justify-center mx-auto mb-4">
           <TrendingUp className="text-text-muted" size={24} />
         </div>
@@ -60,10 +60,10 @@ export default function BudgetOverview({
   }
 
   return (
-    <div className="bg-card p-8 rounded-[2.5rem] border border-border shadow-polish mb-8">
-      <div className="flex items-center justify-between mb-8 px-1">
-        <div>
-          <h3 className="text-xl font-extrabold text-text-main dark:text-white uppercase tracking-tight">
+    <div className="bg-card p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish mb-6 sm:mb-8 min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 px-1">
+        <div className="min-w-0">
+          <h3 className="text-lg sm:text-xl font-extrabold text-text-main dark:text-white uppercase tracking-tight">
             {t('analytics.budget_tracking')}
           </h3>
           <p className="text-[11px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-widest mt-0.5">
@@ -72,13 +72,13 @@ export default function BudgetOverview({
         </div>
         <button
           onClick={onOpenSettings}
-          className="bg-bg dark:bg-slate-800 hover:bg-border dark:hover:bg-slate-700 text-text-main dark:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-border dark:border-slate-700"
+          className="w-full sm:w-auto bg-bg dark:bg-slate-800 hover:bg-border dark:hover:bg-slate-700 text-text-main dark:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-border dark:border-slate-700"
         >
           {t('analytics.adjust_budgets')}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-y-8">
+      <div className="grid grid-cols-1 gap-y-6 sm:gap-y-8">
         {budgetStats.map((stat, index) => {
           const isOver = stat.spent > stat.amount;
           const isWarning = stat.percent >= 80 && !isOver;
@@ -92,8 +92,8 @@ export default function BudgetOverview({
               transition={{ delay: index * 0.05 }}
               className="space-y-3 group"
             >
-              <div className="flex justify-between items-end px-1">
-                <div className="flex items-center gap-2.5">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 px-1">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     className={`p-2 rounded-lg ${
                       isOver
@@ -107,12 +107,12 @@ export default function BudgetOverview({
                     {isWarning && <TrendingUp size={14} />}
                     {!isOver && !isWarning && <CheckCircle2 size={14} />}
                   </div>
-                  <span className="text-[14px] font-black text-text-main dark:text-white uppercase tracking-tight">
+                  <span className="text-[14px] font-black text-text-main dark:text-white uppercase tracking-tight truncate">
                     {stat.category}
                   </span>
                 </div>
 
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-start sm:items-end">
                   <span className="text-[13px] font-black text-text-main dark:text-white leading-none mb-1">
                     {formatAmount(stat.spent)}
                   </span>
@@ -137,7 +137,7 @@ export default function BudgetOverview({
                 />
               </div>
 
-              <div className="flex justify-between items-center px-1">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 px-1">
                 {isOver ? (
                   <span className="text-[9px] font-black text-danger uppercase tracking-widest">
                     Over by {formatAmount(stat.spent - stat.amount)}

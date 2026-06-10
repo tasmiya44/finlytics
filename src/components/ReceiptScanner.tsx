@@ -195,18 +195,18 @@ export default function ReceiptScanner({ onScanComplete, onClose }: ReceiptScann
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="bg-card/80 dark:bg-slate-900/80 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-[0_32px_64px_rgba(0,0,0,0.2)] w-full max-w-lg mx-auto relative overflow-hidden"
+      className="bg-card/80 dark:bg-slate-900/80 backdrop-blur-2xl p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-[0_32px_64px_rgba(0,0,0,0.2)] w-full max-w-lg mx-auto relative overflow-hidden max-h-[92vh] overflow-y-auto"
     >
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/0 via-primary to-primary/0" />
       
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
+      <div className="flex items-start justify-between gap-4 mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
             <Sparkles size={20} className="text-primary" />
           </div>
-          <div>
-            <h3 className="text-xl font-extrabold text-text-main dark:text-white">Smart Scan</h3>
-            <p className="text-[10px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-widest">Powered by Gemini AI</p>
+          <div className="min-w-0">
+            <h3 className="text-lg sm:text-xl font-extrabold text-text-main dark:text-white">Smart Scan</h3>
+            <p className="text-[10px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-widest leading-tight">Powered by Gemini AI</p>
           </div>
         </div>
         <button 
@@ -218,13 +218,13 @@ export default function ReceiptScanner({ onScanComplete, onClose }: ReceiptScann
       </div>
 
       {!preview ? (
-        <label className="border-2 border-dashed border-border dark:border-slate-800 rounded-[2rem] p-12 flex flex-col items-center gap-6 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group relative overflow-hidden">
+        <label className="border-2 border-dashed border-border dark:border-slate-800 rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-12 flex flex-col items-center gap-5 sm:gap-6 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group relative overflow-hidden text-center">
           <input type="file" accept="image/*" className="hidden" onChange={onFileSelect} />
           <motion.div 
             whileHover={{ scale: 1.1 }}
-            className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center relative z-10"
+            className="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 rounded-3xl flex items-center justify-center relative z-10"
           >
-            <Upload size={40} className="text-primary" />
+            <Upload className="text-primary w-8 h-8 sm:w-10 sm:h-10" />
           </motion.div>
           <div className="text-center relative z-10">
             <p className="text-[15px] font-extrabold text-text-main dark:text-white">Drop your receipt here</p>
@@ -234,7 +234,7 @@ export default function ReceiptScanner({ onScanComplete, onClose }: ReceiptScann
         </label>
       ) : (
         <div className="space-y-6">
-          <div className="relative rounded-[2rem] overflow-hidden border border-border dark:border-white/10 shadow-2xl bg-bg dark:bg-slate-950 aspect-[4/3] flex items-center justify-center p-2">
+          <div className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden border border-border dark:border-white/10 shadow-2xl bg-bg dark:bg-slate-950 aspect-[4/3] flex items-center justify-center p-2">
             <img src={preview} alt="Receipt Preview" className="max-w-full max-h-full object-contain rounded-2xl shadow-lg" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
             <button 
@@ -261,7 +261,7 @@ export default function ReceiptScanner({ onScanComplete, onClose }: ReceiptScann
           <button
             onClick={handleScan}
             disabled={isScanning}
-            className="w-full py-5 bg-primary text-white rounded-[1.25rem] font-extrabold text-[15px] shadow-[0_10px_30px_rgba(59,130,246,0.3)] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:bg-primary-hover active:scale-[0.98] group overflow-hidden relative"
+            className="w-full py-4 sm:py-5 bg-primary text-white rounded-[1.25rem] font-extrabold text-sm sm:text-[15px] shadow-[0_10px_30px_rgba(59,130,246,0.3)] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:bg-primary-hover active:scale-[0.98] group overflow-hidden relative"
           >
             {isScanning ? (
               <>

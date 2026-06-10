@@ -92,10 +92,10 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 min-w-0">
       <AnimatePresence>
         {showScanner && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
             <ReceiptScanner 
               onScanComplete={handleScanComplete} 
               onClose={() => setShowScanner(false)} 
@@ -113,17 +113,17 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-card p-6 sm:p-8 rounded-[2.5rem] border border-border shadow-xl relative overflow-hidden"
+        className="bg-card p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-xl relative overflow-hidden max-w-full"
       >
         {/* Subtle background decoration */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex items-center justify-between mb-8 relative z-10">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 relative z-10">
+          <div className="flex items-center gap-3 min-w-0">
             <div className={`w-10 h-10 ${editingExpense ? 'bg-primary/20' : 'bg-primary/10'} rounded-xl flex items-center justify-center`}>
               {editingExpense ? <Check size={20} className="text-primary" /> : <Plus size={20} className="text-primary" />}
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-lg font-black text-text-main dark:text-white tracking-tight">
                 {editingExpense ? 'Edit Entry' : 'Manual Entry'}
               </h2>
@@ -131,12 +131,12 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {!editingExpense && (
               <button
                 type="button"
                 onClick={() => setShowScanner(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-xl font-black text-[10px] uppercase tracking-widest transition-all hover:bg-accent/20 active:scale-95"
+                className="flex w-full sm:w-auto items-center justify-center gap-2 px-4 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-xl font-black text-[10px] uppercase tracking-widest transition-all hover:bg-accent/20 active:scale-95"
               >
                 <Camera size={14} />
                 Smart Scan
@@ -152,11 +152,11 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
 
         <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
           {formData.receiptUrl && (
-            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 flex items-center gap-4">
+            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 flex items-start sm:items-center gap-4 min-w-0">
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shadow-sm border border-border/50">
                 <img src={formData.receiptUrl} alt="Receipt" className="w-full h-full object-cover" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="text-[10px] font-black text-primary uppercase tracking-widest">Document Attached</p>
                 <p className="text-xs font-bold text-text-muted truncate">Receipt from transaction analysis</p>
               </div>
@@ -248,8 +248,8 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
             </button>
 
             {/* Tip Box */}
-            <div className="bg-bg/50 dark:bg-slate-900/50 border border-border/40 p-4 rounded-xl flex items-center gap-3">
-              <div className="text-text-main dark:text-white opacity-60">
+            <div className="bg-bg/50 dark:bg-slate-900/50 border border-border/40 p-4 rounded-xl flex items-start gap-3">
+              <div className="text-text-main dark:text-white opacity-60 shrink-0 mt-0.5">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2.2 1.5 3.1.7.7 1.3 1.5 1.5 2.4"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
               </div>
               <p className="text-[11px] font-bold text-text-muted leading-relaxed">
@@ -260,7 +260,7 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl font-black text-[13px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-[0.98] mt-2"
+            className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl font-black text-[12px] sm:text-[13px] uppercase tracking-[0.16em] sm:tracking-[0.2em] shadow-lg shadow-primary/20 transition-all hover:bg-primary-hover active:scale-[0.98] mt-2"
           >
             {editingExpense ? 'Finish Editing' : 'Add Recording'}
             <ChevronRight size={16} />
@@ -270,4 +270,3 @@ export default function ExpenseForm({ onAddExpense, onUpdateExpense, editingExpe
     </div>
   );
 }
-

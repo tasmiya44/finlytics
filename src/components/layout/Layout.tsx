@@ -7,26 +7,33 @@ import DashboardLoader from '../DashboardLoader';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, initialLoading } = useApp();
 
   return (
-    <div className="flex min-h-screen bg-bg selection:bg-primary/20">
+    <div className="flex min-h-screen bg-bg selection:bg-primary/20 overflow-x-hidden">
       {user && initialLoading ? (
-        <div className="flex-1 flex flex-col items-center justify-center min-h-screen">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-screen px-4">
           <DashboardLoader name={user.name} />
         </div>
       ) : (
         <>
-          <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+          <Sidebar
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
+            isMobileOpen={isMobileMenuOpen}
+            setIsMobileOpen={setIsMobileMenuOpen}
+          />
           
-          <div className="flex-1 flex flex-col min-w-0">
-            <TopBar />
+          <div className="flex-1 flex flex-col min-w-0 w-full">
+            <TopBar onMenuClick={() => setIsMobileMenuOpen(true)} />
             
-            <main className="flex-1 p-6 lg:p-10">
+            <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 sm:p-6 lg:p-10">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
+                className="w-full max-w-full"
               >
                 {children}
               </motion.div>

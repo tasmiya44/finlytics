@@ -25,22 +25,22 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full min-w-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-text-main dark:text-white tracking-tight">Transactions</h1>
-          <p className="text-text-muted font-medium">Manage and track your detailed spending history.</p>
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight">Transactions</h1>
+          <p className="text-sm sm:text-base text-text-muted font-medium">Manage and track your detailed spending history.</p>
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="flex items-center gap-2 bg-primary text-white font-black py-3 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] transition-all active:scale-[0.98]"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white font-black py-3 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] transition-all active:scale-[0.98]"
         >
           <Plus size={18} />
           Add Transaction
         </button>
       </div>
 
-      <div className="bg-card p-6 sm:p-8 rounded-[2.5rem] border border-border shadow-polish">
+      <div className="bg-card p-4 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-primary/10 rounded-lg text-primary">
             <FilterIcon size={18} />
@@ -56,9 +56,9 @@ export default function TransactionsPage() {
         />
       </div>
 
-      <div className="bg-card rounded-[2.5rem] border border-border shadow-polish overflow-hidden">
-        <div className="p-6 sm:p-8 border-b border-border/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
+      <div className="bg-card rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-polish overflow-hidden">
+        <div className="p-4 sm:p-8 border-b border-border/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-lg font-black text-text-main dark:text-white tracking-tight">Search Results</h3>
             <span className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-widest">
               {filteredExpenses.length} Records
@@ -97,7 +97,7 @@ export default function TransactionsPage() {
       {/* Modal Form */}
       <AnimatePresence>
         {isFormOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -112,7 +112,7 @@ export default function TransactionsPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-md"
+              className="relative w-full max-w-md max-h-[92vh] overflow-y-auto"
             >
               <ExpenseForm 
                 onAddExpense={(data) => {

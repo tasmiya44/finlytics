@@ -50,11 +50,11 @@ export default function BudgetSettings({
   };
 
   return (
-    <div className="bg-card p-8 rounded-[2.5rem] border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] w-full max-w-md">
-      <div className="flex justify-between items-center mb-8 px-1">
-        <div>
-          <h2 className="text-xl font-extrabold text-text-main dark:text-white">Budgeting</h2>
-          <p className="text-[11px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-widest mt-0.5">
+    <div className="bg-card p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="flex justify-between items-start gap-4 mb-6 sm:mb-8 px-1">
+        <div className="min-w-0">
+          <h2 className="text-lg sm:text-xl font-extrabold text-text-main dark:text-white">Budgeting</h2>
+          <p className="text-[10px] sm:text-[11px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-widest mt-0.5">
             Control your spending
           </p>
         </div>
@@ -64,13 +64,13 @@ export default function BudgetSettings({
         </button>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         <div className="space-y-4">
           <h3 className="text-[10px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-[0.15em] px-1">
             Current Allocations
           </h3>
 
-          <div className="max-h-[200px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+          <div className="max-h-[180px] sm:max-h-[200px] overflow-y-auto space-y-2 pr-1 sm:pr-2 custom-scrollbar">
             {currentBudgets.length === 0 ? (
               <div className="py-8 text-center bg-bg dark:bg-slate-900 rounded-2xl border border-dashed border-border dark:border-slate-700">
                 <p className="text-xs text-text-muted dark:text-slate-400 font-bold italic">
@@ -85,10 +85,10 @@ export default function BudgetSettings({
                   <motion.div
                     layout
                     key={b.category}
-                    className="flex justify-between items-center bg-bg dark:bg-slate-900 px-5 py-4 rounded-2xl border border-border dark:border-slate-700 group hover:border-primary/30 transition-all shadow-sm"
+                    className="flex justify-between items-center gap-3 bg-bg dark:bg-slate-900 px-4 sm:px-5 py-4 rounded-2xl border border-border dark:border-slate-700 group hover:border-primary/30 transition-all shadow-sm"
                   >
-                    <div className="flex flex-col">
-                      <span className="text-[14px] font-bold text-text-main dark:text-white">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[14px] font-bold text-text-main dark:text-white truncate">
                         {b.category}
                       </span>
                       <span className="text-[12px] font-extrabold text-primary dark:text-cyan-400">
@@ -96,7 +96,7 @@ export default function BudgetSettings({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100">
+                    <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all transform sm:scale-90 sm:group-hover:scale-100 shrink-0">
                       <button
                         onClick={() => handleEdit(b)}
                         className="p-2 hover:bg-card dark:hover:bg-slate-800 rounded-xl text-text-muted dark:text-slate-400 hover:text-primary transition-all shadow-sm bg-bg dark:bg-slate-900 border border-border dark:border-slate-700"
@@ -120,7 +120,7 @@ export default function BudgetSettings({
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-6 pt-6 border-t border-border dark:border-slate-700">
+        <form onSubmit={handleSave} className="space-y-5 sm:space-y-6 pt-6 border-t border-border dark:border-slate-700">
           <h3 className="text-[10px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-[0.15em] px-1">
             {currentBudgets.find(b => b.category === editingCategory)
               ? 'Maintain Limit'

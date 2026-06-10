@@ -76,7 +76,7 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
           value={nlQuery}
           onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
           onChange={handleSearchChange}
-          className="w-full pl-12 pr-40 py-4 bg-bg dark:bg-slate-900 border border-border/60 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all dark:text-white placeholder:text-text-muted/40 placeholder:italic"
+          className="w-full pl-12 pr-12 sm:pr-40 py-4 bg-bg dark:bg-slate-900 border border-border/60 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all dark:text-white placeholder:text-text-muted/40 placeholder:italic"
         />
         <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-3">
           {nlQuery && (
@@ -92,7 +92,7 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black tracking-widest uppercase transition-all duration-300 ${
+            className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black tracking-widest uppercase transition-all duration-300 ${
               isExpanded || activeFiltersCount > 0 
                 ? 'bg-primary text-white shadow-lg shadow-primary/20' 
                 : 'bg-card border border-border text-text-muted hover:text-text-main hover:border-primary/40'
@@ -105,6 +105,20 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
         </div>
       </div>
 
+      <button
+        type="button"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`sm:hidden w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[11px] font-black tracking-widest uppercase transition-all duration-300 ${
+          isExpanded || activeFiltersCount > 0 
+            ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+            : 'bg-card border border-border text-text-muted hover:text-text-main hover:border-primary/40'
+        }`}
+      >
+        <Filter size={14} />
+        <span>{activeFiltersCount > 0 ? `Filters (${activeFiltersCount})` : 'Advanced Filters'}</span>
+        <ChevronDown size={14} className={`transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} />
+      </button>
+
       {/* Advanced Filters Panel */}
       <AnimatePresence>
         {isExpanded && (
@@ -114,7 +128,7 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-card dark:bg-slate-800 border border-border dark:border-slate-700 p-6 rounded-[28px] shadow-polish-strong">
+            <div className="bg-card dark:bg-slate-800 border border-border dark:border-slate-700 p-4 sm:p-6 rounded-[24px] sm:rounded-[28px] shadow-polish-strong">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
                 
                 {/* Category Selection */}
@@ -140,7 +154,7 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
                   <label className="text-[11px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-[0.1em] pl-1 flex items-center gap-2">
                     <DollarSign size={12} className="text-primary" /> Amount Range
                   </label>
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-2">
                     <input
                       type="number"
                       placeholder="Min"
@@ -148,7 +162,7 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
                       onChange={(e) => handleFilterChange('minAmount', e.target.value)}
                       className="w-full bg-bg dark:bg-slate-900 border border-border dark:border-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium dark:text-white focus:ring-2 focus:ring-primary/20 outline-none transition-all hover:border-primary/50"
                     />
-                    <span className="text-text-muted font-bold">-</span>
+                    <span className="hidden sm:inline text-text-muted font-bold">-</span>
                     <input
                       type="number"
                       placeholder="Max"
@@ -164,14 +178,14 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
                   <label className="text-[11px] font-bold text-text-muted dark:text-slate-400 uppercase tracking-[0.1em] pl-1 flex items-center gap-2">
                     <Calendar size={12} className="text-primary" /> Date Range
                   </label>
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-2">
                     <input
                       type="date"
                       value={filters.startDate}
                       onChange={(e) => handleFilterChange('startDate', e.target.value)}
                       className="w-full bg-bg dark:bg-slate-900 border border-border dark:border-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium dark:text-white focus:ring-2 focus:ring-primary/20 outline-none transition-all hover:border-primary/50"
                     />
-                    <span className="text-text-muted font-bold">-</span>
+                    <span className="hidden sm:inline text-text-muted font-bold">-</span>
                     <input
                       type="date"
                       value={filters.endDate}
@@ -183,11 +197,11 @@ export default function Filters({ onFilter, categories, initialNlQuery = '', ini
               </div>
 
               {/* Reset Action */}
-              <div className="mt-6 pt-5 border-t border-border dark:border-slate-700/50 flex justify-end">
+              <div className="mt-6 pt-5 border-t border-border dark:border-slate-700/50 flex justify-stretch sm:justify-end">
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="group text-[12px] font-bold text-[#F87171] hover:text-[#EF4444] transition-all flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-[#FEE2E2] dark:hover:bg-red-950/30"
+                  className="w-full sm:w-auto group text-[12px] font-bold text-[#F87171] hover:text-[#EF4444] transition-all flex items-center justify-center gap-2 px-4 py-2 rounded-xl hover:bg-[#FEE2E2] dark:hover:bg-red-950/30"
                 >
                   <X size={14} className="group-hover:rotate-90 transition-transform duration-300" /> 
                   Reset Filters

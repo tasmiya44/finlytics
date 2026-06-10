@@ -37,7 +37,7 @@ export default function ExpenseList({ expenses, onDelete, onEdit, showAll = fals
 
   if (expenses.length === 0) {
     return (
-      <div className="py-20 text-center text-text-muted italic flex flex-col items-center justify-center gap-4 border-2 border-dashed border-border rounded-3xl bg-bg/20">
+      <div className="py-16 sm:py-20 px-4 text-center text-text-muted italic flex flex-col items-center justify-center gap-4 border-2 border-dashed border-border rounded-3xl bg-bg/20">
         <div className="w-12 h-12 rounded-full bg-card flex items-center justify-center">
           <Receipt size={24} className="opacity-20" />
         </div>
@@ -77,9 +77,9 @@ export default function ExpenseList({ expenses, onDelete, onEdit, showAll = fals
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ delay: Math.min(index * 0.03, 0.2) }}
             onClick={() => setActiveMobileId(activeMobileId === expense.id ? null : expense.id)}
-            className={`group/expense bg-card p-4 rounded-2xl border border-border/50 flex items-center justify-between gap-4 transition-all hover:shadow-sm hover:border-primary/20 relative cursor-pointer md:cursor-default`}
+            className="group/expense bg-card p-3 sm:p-4 rounded-2xl border border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 transition-all hover:shadow-sm hover:border-primary/20 relative cursor-pointer md:cursor-default min-w-0"
           >
-            <div className={`flex items-center gap-4 flex-1 min-w-0 transition-all duration-300`}>
+            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full transition-all duration-300">
               <div 
                 className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm text-sm font-black"
                 style={getCategoryStyles(expense.category)}
@@ -87,7 +87,7 @@ export default function ExpenseList({ expenses, onDelete, onEdit, showAll = fals
                 {expense.category.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <h4 className="text-sm font-black text-text-main dark:text-white truncate tracking-tight">{expense.description}</h4>
                   {expense.receiptUrl && (
                     <a 
@@ -102,14 +102,14 @@ export default function ExpenseList({ expenses, onDelete, onEdit, showAll = fals
                     </a>
                   )}
                 </div>
-                <div className="flex items-center gap-2 mt-0.5">
+                <div className="flex items-center gap-2 mt-0.5 min-w-0">
                   <span className="text-[10px] font-black text-text-muted dark:text-slate-400 uppercase tracking-widest italic">{expense.category}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 relative">
-              <div className="text-right">
+            <div className="flex items-center justify-between sm:justify-end gap-4 relative w-full sm:w-auto">
+              <div className="text-left sm:text-right">
                 <div className="text-sm font-black text-text-main dark:text-white tracking-tight">
                   -{formatAmount(expense.amount)}
                 </div>
@@ -140,7 +140,7 @@ export default function ExpenseList({ expenses, onDelete, onEdit, showAll = fals
                       initial={{ opacity: 0, scale: 0.95, y: -5, x: 0 }}
                       animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -5, x: 0 }}
-                      className="absolute right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-border shadow-xl rounded-xl py-1.5 z-50 min-w-[140px] overflow-hidden"
+                      className="absolute right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-border shadow-xl rounded-xl py-1.5 z-50 min-w-[150px] overflow-hidden"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
@@ -221,4 +221,3 @@ function getCategoryStyles(category: string) {
     default: return { backgroundColor: '#EDF2F7', color: '#BDCEDB' };
   }
 }
-

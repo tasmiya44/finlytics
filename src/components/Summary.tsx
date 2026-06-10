@@ -49,21 +49,21 @@ export default function Summary({ expenses }: { expenses: any[] }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className="bg-card p-8 rounded-[2.5rem] border border-border/60 shadow-polish flex items-center gap-6 transition-all hover:shadow-hover hover:border-primary/20 group"
+          className="bg-card p-5 sm:p-8 rounded-[1.75rem] sm:rounded-[2.5rem] border border-border/60 shadow-polish flex items-center gap-4 sm:gap-6 transition-all hover:shadow-hover hover:border-primary/20 group min-w-0"
         >
-          <div className={`w-16 h-16 rounded-[1.5rem] ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+          <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-[1.25rem] sm:rounded-[1.5rem] ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform shrink-0`}>
             {stat.icon}
           </div>
-          <div>
+          <div className="min-w-0">
             <h3 className="text-[11px] font-black text-text-muted dark:text-slate-400 uppercase tracking-[0.2em] mb-1.5 opacity-60 leading-none">{stat.label}</h3>
-            <div className={`text-2xl font-black ${stat.textColor} dark:text-white leading-none tracking-tight`}>
+            <div className={`text-xl sm:text-2xl font-black ${stat.textColor} dark:text-white leading-tight tracking-tight truncate`}>
               {stat.value}
             </div>
           </div>
@@ -72,4 +72,3 @@ export default function Summary({ expenses }: { expenses: any[] }) {
     </div>
   );
 }
-

@@ -11,15 +11,15 @@ export default function AnalyticsPage() {
   const [isBudgetSettingsOpen, setIsBudgetSettingsOpen] = useState(false);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full min-w-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-text-main dark:text-white tracking-tight">{t('analytics.title')}</h1>
-          <p className="text-text-muted font-medium">{t('analytics.subtitle')}</p>
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight">{t('analytics.title')}</h1>
+          <p className="text-sm sm:text-base text-text-muted font-medium">{t('analytics.subtitle')}</p>
         </div>
         <button
           onClick={() => setIsBudgetSettingsOpen(true)}
-          className="flex items-center gap-2 bg-text-main dark:bg-white text-white dark:text-text-main font-black py-3 px-6 rounded-2xl shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-text-main dark:bg-white text-white dark:text-text-main font-black py-3 px-6 rounded-2xl shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
         >
           <Target size={18} />
           {t('analytics.adjust_budgets')}
@@ -42,7 +42,7 @@ export default function AnalyticsPage() {
 
       <AnimatePresence>
         {isBudgetSettingsOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -54,7 +54,7 @@ export default function AnalyticsPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-md"
+              className="relative w-full max-w-md max-h-[92vh] overflow-y-auto"
             >
               <BudgetSettings 
                 currentBudgets={budgets}

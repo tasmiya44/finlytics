@@ -17,9 +17,11 @@ import { motion, AnimatePresence } from 'motion/react';
 interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (v: boolean) => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (v: boolean) => void;
 }
 
-export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }: SidebarProps) {
   const { t } = useApp();
 
   const MENU_ITEMS = [
@@ -30,15 +32,13 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     { icon: PieChart, label: t('nav.categories'), path: '/categories' },
     { icon: Settings, label: t('nav.settings'), path: '/settings' },
   ];
-  return (
-    <motion.aside
-      initial={false}
-      animate={{ width: isCollapsed ? 80 : 260 }}
-      className="h-screen bg-card border-r border-border flex flex-col transition-all sticky top-0"
-    >
+  const displayCollapsed = isCollapsed && !isMobileOpen;
+
+  const content = (
+    <>
       <div className="p-6 flex items-center justify-between overflow-hidden">
         <AnimatePresence mode="wait">
-          {!isCollapsed && (
+          {!displayCollapsed && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -51,7 +51,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               <span className="font-black text-lg tracking-tight text-text-main dark:text-white">Finlytics</span>
             </motion.div>
           )}
-          {isCollapsed && (
+          {displayCollapsed && (
             <motion.div
               key="collapsed-logo"
               initial={{ opacity: 0 }}
@@ -71,6 +71,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={() => setIsMobileOpen(false)}
             className={({ isActive }) => `
               flex items-center gap-4 px-3 py-3 rounded-xl transition-all group
               ${isActive 
@@ -79,11 +80,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               }
             `}
           >
-            <item.icon size={22} className={`${!isCollapsed ? 'shrink-0' : 'mx-auto'} transition-colors`} />
-            {!isCollapsed && (
+            <item.icon size={22} className={`${!displayCollapsed ? 'shrink-0' : 'mx-auto'} transition-colors`} />
+            {!displayCollapsed && (
               <span className="font-bold text-sm tracking-tight">{item.label}</span>
             )}
-            {isCollapsed && (
+            {displayCollapsed && (
               <div className="absolute left-full ml-6 px-3 py-1 bg-text-main text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
                 {item.label}
               </div>
@@ -94,10 +95,45 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="p-4 border-t border-border flex items-center justify-center text-text-muted hover:text-primary transition-colors mb-2"
+        className="hidden lg:flex p-4 border-t border-border items-center justify-center text-text-muted hover:text-primary transition-colors mb-2"
       >
         {isCollapsed ? <ChevronRight size={20} /> : <div className="flex items-center gap-2 font-bold text-xs"><ChevronLeft size={18} /> {t('nav.collapse')}</div>}
       </button>
-    </motion.aside>
+    </>
+  );
+
+  return (
+    <>
+      <motion.aside
+        initial={false}
+        animate={{ width: isCollapsed ? 80 : 260 }}
+        className="hidden lg:flex h-screen bg-card border-r border-border flex-col transition-all sticky top-0 shrink-0 z-50"
+      >
+        {content}
+      </motion.aside>
+
+      <AnimatePresence>
+        {isMobileOpen && (
+          <div className="fixed inset-0 z-[120] lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileOpen(false)}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            />
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+              className="relative h-full w-[min(82vw,280px)] bg-card border-r border-border flex flex-col shadow-2xl"
+            >
+              {content}
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

@@ -14,14 +14,14 @@ export default function CategoriesPage() {
   if (!user) return null;
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto pb-20 px-4 md:px-0">
+    <div className="space-y-8 sm:space-y-12 max-w-7xl mx-auto pb-20 w-full min-w-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-black text-text-main dark:text-white tracking-tight">{t('categories.title')}</h1>
-          <p className="text-text-muted font-medium">{t('categories.subtitle')}</p>
+        <div className="flex flex-col gap-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight">{t('categories.title')}</h1>
+          <p className="text-sm sm:text-base text-text-muted font-medium">{t('categories.subtitle')}</p>
         </div>
         
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           <button
             onClick={() => setShowManageModal(true)}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-accent/10 text-accent border border-accent/20 font-black py-3 px-6 rounded-2xl hover:bg-accent/20 transition-all active:scale-[0.98]"
