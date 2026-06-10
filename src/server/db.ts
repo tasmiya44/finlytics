@@ -84,6 +84,10 @@ export class PostgresDb {
         year INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
+      CREATE INDEX IF NOT EXISTS idx_budgets_user_id ON budgets(user_id);
+      CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id);
     `);
 
     const catCount = await this.pool.query('SELECT COUNT(*) as count FROM categories');

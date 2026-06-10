@@ -97,15 +97,16 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const normalizeExpense = (expense: any): Expense => ({
   ...expense,
   id: Number(expense.id),
-  userId: Number(expense.userId),
-  amount: Number(expense.amount || 0)
+  amount: Number(expense.amount),
+  userId: Number(expense.userId ?? expense.userid),
+  receiptUrl: expense.receiptUrl ?? expense.receipturl
 });
 
 const normalizeBudget = (budget: any): Budget => ({
   ...budget,
   id: Number(budget.id),
-  userId: Number(budget.userId),
-  amount: Number(budget.amount || 0)
+  amount: Number(budget.amount),
+  userId: Number(budget.userId ?? budget.userid)
 });
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -113,7 +114,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = localStorage.getItem('expense_tracker_user_v3');
     return saved ? JSON.parse(saved) : null;
   });
-
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
@@ -121,7 +121,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   const [currency, setCurrencyState] = useState<Currency>(() => {
     return (localStorage.getItem('app_currency') as Currency) || 'INR';
   });
@@ -132,13 +132,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('app_settings');
-    return saved
-      ? JSON.parse(saved)
-      : {
-          twoFactor: false,
-          emailNotifications: true,
-          connectedApps: []
-        };
+    return saved ? JSON.parse(saved) : {
+      twoFactor: false,
+      emailNotifications: true,
+      connectedApps: []
+    };
   });
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -171,59 +169,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setExpenses([]);
     setFilteredExpenses([]);
     setBudgets([]);
-    setCategories([]);
     setInitialLoading(true);
   }, []);
 
-  const t = useCallback(
-    (key: string) => {
-      return translations[language][key] || key;
-    },
-    [language]
-  );
+  const t = useCallback((key: string) => {
+    return translations[language][key] || key;
+  }, [language]);
 
-  const formatAmount = useCallback(
-    (amount: number) => {
-      const safeAmount = Number(amount || 0);
-      const converted = safeAmount * CONVERSION_RATES[currency];
-
-      return new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', {
-        style: 'currency',
-        currency: currency === 'INR' ? 'INR' : currency === 'USD' ? 'USD' : 'EUR',
-        minimumFractionDigits: 2
-      }).format(converted);
-    },
-    [currency, language]
-  );
+  const formatAmount = useCallback((amount: number) => {
+    const converted = amount * CONVERSION_RATES[currency];
+    return new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', {
+      style: 'currency',
+      currency: currency === 'INR' ? 'INR' : currency === 'USD' ? 'USD' : 'EUR',
+      minimumFractionDigits: 2
+    }).format(converted);
+  }, [currency, language]);
 
   const generateNotifications = useCallback(() => {
     const newNotifications: Notification[] = [];
-
+    
+    // Check budgets
     budgets.forEach(b => {
-      const budgetAmount = Number(b.amount || 0);
-
       const spent = expenses
         .filter(e => {
           const d = new Date(e.date);
           const now = new Date();
-
-          return (
-            e.category?.toLowerCase() === b.category?.toLowerCase() &&
-            d.getMonth() === now.getMonth() &&
-            d.getFullYear() === now.getFullYear()
-          );
+          return (e.category?.toLowerCase() === b.category?.toLowerCase()) && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
         })
-        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
-
-      const percent = budgetAmount > 0 ? (spent / budgetAmount) * 100 : 0;
-
+        .reduce((sum, e) => sum + Number(e.amount), 0);
+      
+      const percent = (spent / b.amount) * 100;
       if (percent >= 100) {
         newNotifications.push({
           id: Date.now() + Math.random(),
           title: `${b.category} Budget Exceeded`,
-          message: `Your spending in ${b.category} has exceeded the budget of ${formatAmount(
-            budgetAmount
-          )} by ${formatAmount(spent - budgetAmount)}.`,
+          message: `Your spending in ${b.category} has exceeded the budget of ${formatAmount(b.amount)} by ${formatAmount(spent - b.amount)}.`,
           time: 'Just now',
           type: 'warning'
         });
@@ -259,17 +239,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const fetchCategories = useCallback(async () => {
     if (!user) return;
-
     try {
-      const res = await fetch(getApiUrl('/api/categories'), {
-        headers: { 'x-user-id': user.id.toString() }
-      });
-
+      const res = await fetch(getApiUrl('/api/categories'), { headers: { 'x-user-id': user.id.toString() } });
       if (res.status === 401) {
         logout();
         return;
       }
-
       if (res.ok) {
         setCategories(await res.json());
       }
@@ -278,83 +253,67 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [user, logout]);
 
-  const fetchExpenses = useCallback(
-    async (filters: any = {}) => {
-      if (!user) return;
+  const fetchExpenses = useCallback(async (filters: any = {}) => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      
+      const headers = { 'x-user-id': user.id.toString() };
+      
+      const params = new URLSearchParams();
+      if (filters.category && filters.category !== 'All') params.append('category', filters.category);
+      if (filters.minAmount) params.append('minAmount', filters.minAmount);
+      if (filters.maxAmount) params.append('maxAmount', filters.maxAmount);
+      if (filters.startDate) params.append('startDate', filters.startDate);
+      if (filters.endDate) params.append('endDate', filters.endDate);
+      if (filters.nlQuery) params.append('nlQuery', filters.nlQuery);
 
-      try {
-        setLoading(true);
+      // Fetch all required dashboard datasets in parallel to bypass sequential latency
+      const [budgetsRes, expRes, allExpRes, categoriesRes] = await Promise.all([
+        fetch(getApiUrl('/api/budgets'), { headers }),
+        fetch(getApiUrl(`/api/expenses/filter?${params.toString()}`), { headers }),
+        fetch(getApiUrl('/api/expenses'), { headers }),
+        fetch(getApiUrl('/api/categories'), { headers })
+      ]);
 
-        const headers = { 'x-user-id': user.id.toString() };
-
-        const params = new URLSearchParams();
-
-        if (filters.category && filters.category !== 'All') {
-          params.append('category', filters.category);
-        }
-        if (filters.minAmount) {
-          params.append('minAmount', filters.minAmount);
-        }
-        if (filters.maxAmount) {
-          params.append('maxAmount', filters.maxAmount);
-        }
-        if (filters.startDate) {
-          params.append('startDate', filters.startDate);
-        }
-        if (filters.endDate) {
-          params.append('endDate', filters.endDate);
-        }
-        if (filters.nlQuery) {
-          params.append('nlQuery', filters.nlQuery);
-        }
-
-        const [budgetsRes, expRes, allExpRes, categoriesRes] = await Promise.all([
-          fetch(getApiUrl('/api/budgets'), { headers }),
-          fetch(getApiUrl(`/api/expenses/filter?${params.toString()}`), { headers }),
-          fetch(getApiUrl('/api/expenses'), { headers }),
-          fetch(getApiUrl('/api/categories'), { headers })
-        ]);
-
-        if (
-          budgetsRes.status === 401 ||
-          expRes.status === 401 ||
-          allExpRes.status === 401 ||
-          categoriesRes.status === 401
-        ) {
-          logout();
-          return;
-        }
-
-        if (budgetsRes.ok) {
-          const budgetData = await budgetsRes.json();
-          setBudgets(budgetData.map(normalizeBudget));
-        }
-
-        if (expRes.ok) {
-          const filteredData = await expRes.json();
-          setFilteredExpenses(filteredData.map(normalizeExpense));
-        }
-
-        if (allExpRes.ok) {
-          const expenseData = await allExpRes.json();
-          setExpenses(expenseData.map(normalizeExpense));
-        }
-
-        if (categoriesRes.ok) {
-          setCategories(await categoriesRes.json());
-        }
-
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching:', err);
-        setError('Could not load data.');
-      } finally {
-        setLoading(false);
-        setInitialLoading(false);
+      if (
+        budgetsRes.status === 401 ||
+        expRes.status === 401 ||
+        allExpRes.status === 401 ||
+        categoriesRes.status === 401
+      ) {
+        logout();
+        return;
       }
-    },
-    [user, logout]
-  );
+
+      if (budgetsRes.ok) {
+        const budgetsData = await budgetsRes.json();
+        setBudgets(budgetsData.map(normalizeBudget));
+      }
+      
+      if (expRes.ok) {
+        const filteredData = await expRes.json();
+        setFilteredExpenses(filteredData.map(normalizeExpense));
+      }
+
+      if (allExpRes.ok) {
+        const expensesData = await allExpRes.json();
+        setExpenses(expensesData.map(normalizeExpense));
+      }
+
+      if (categoriesRes.ok) {
+        setCategories(await categoriesRes.json());
+      }
+
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching:', err);
+      setError('Could not load data.');
+    } finally {
+      setLoading(false);
+      setInitialLoading(false);
+    }
+  }, [user, logout]);
 
   useEffect(() => {
     if (user) {
@@ -367,26 +326,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const addExpense = async (newExpense: Omit<Expense, 'id' | 'userId'>) => {
     if (!user) return;
-
     const response = await fetch(getApiUrl('/api/expenses'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': user.id.toString()
-      },
-      body: JSON.stringify({
-        ...newExpense,
-        amount: Number(newExpense.amount || 0)
-      })
+      headers: { 'Content-Type': 'application/json', 'x-user-id': user.id.toString() },
+      body: JSON.stringify(newExpense),
     });
-
     if (response.status === 401) {
       logout();
       return;
     }
-
     if (response.ok) {
-      await fetchExpenses();
+      fetchExpenses();
     } else {
       const errData = await response.json().catch(() => ({}));
       throw new Error(errData.message || 'Error occurred while saving your transaction.');
@@ -395,26 +345,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateExpense = async (id: number, updatedExpense: Omit<Expense, 'id' | 'userId'>) => {
     if (!user) return;
-
     const response = await fetch(getApiUrl(`/api/expenses/${id}`), {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': user.id.toString()
-      },
-      body: JSON.stringify({
-        ...updatedExpense,
-        amount: Number(updatedExpense.amount || 0)
-      })
+      headers: { 'Content-Type': 'application/json', 'x-user-id': user.id.toString() },
+      body: JSON.stringify(updatedExpense),
     });
-
     if (response.status === 401) {
       logout();
       return;
     }
-
     if (response.ok) {
-      await fetchExpenses();
+      fetchExpenses();
     } else {
       const errData = await response.json().catch(() => ({}));
       throw new Error(errData.message || 'Error occurred while updating your transaction.');
@@ -423,17 +364,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteExpense = async (id: number) => {
     if (!user) return;
-
     const response = await fetch(getApiUrl(`/api/expenses/${id}`), {
       method: 'DELETE',
       headers: { 'x-user-id': user.id.toString() }
     });
-
     if (response.status === 401) {
       logout();
       return;
     }
-
     if (response.ok) {
       setExpenses(prev => prev.filter(e => e.id !== id));
       setFilteredExpenses(prev => prev.filter(e => e.id !== id));
@@ -445,100 +383,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateBudget = async (category: string, amount: number) => {
     if (!user) return;
-
     const response = await fetch(getApiUrl('/api/budgets'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': user.id.toString()
-      },
-      body: JSON.stringify({
-        category,
-        amount: Number(amount || 0)
-      })
+      headers: { 'Content-Type': 'application/json', 'x-user-id': user.id.toString() },
+      body: JSON.stringify({ category, amount }),
     });
-
     if (response.status === 401) {
       logout();
       return;
     }
-
     if (response.ok) {
-      const budRes = await fetch(getApiUrl('/api/budgets'), {
-        headers: { 'x-user-id': user.id.toString() }
-      });
-
+      const budRes = await fetch(getApiUrl('/api/budgets'), { headers: { 'x-user-id': user.id.toString() } });
       if (budRes.status === 401) {
         logout();
         return;
       }
-
-      if (budRes.ok) {
-        const budgetData = await budRes.json();
-        setBudgets(budgetData.map(normalizeBudget));
-      }
+      const budgetsData = await budRes.json();
+      setBudgets(budgetsData.map(normalizeBudget));
     }
   };
 
   const deleteBudget = async (category: string) => {
     if (!user) return;
-
     const response = await fetch(getApiUrl(`/api/budgets/${category}`), {
       method: 'DELETE',
       headers: { 'x-user-id': user.id.toString() }
     });
-
     if (response.status === 401) {
       logout();
       return;
     }
-
-    if (response.ok) {
-      setBudgets(prev => prev.filter(b => b.category !== category));
-    }
+    if (response.ok) setBudgets(prev => prev.filter(b => b.category !== category));
   };
 
   const addCategory = async (name: string): Promise<Category> => {
     if (!user) throw new Error('Not logged in');
-
     const response = await fetch(getApiUrl('/api/categories'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': user.id.toString()
-      },
-      body: JSON.stringify({ name })
+      headers: { 'Content-Type': 'application/json', 'x-user-id': user.id.toString() },
+      body: JSON.stringify({ name }),
     });
-
     if (response.status === 401) {
       logout();
       throw new Error('Session expired');
     }
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Error creating category');
     }
-
     const newCat = await response.json();
     setCategories(prev => [...prev, newCat]);
-
     return newCat;
   };
 
   const deleteCategory = async (id: number) => {
     if (!user) return;
-
     const response = await fetch(getApiUrl(`/api/categories/${id}`), {
       method: 'DELETE',
       headers: { 'x-user-id': user.id.toString() }
     });
-
     if (response.status === 401) {
       logout();
       return;
     }
-
     if (response.ok) {
       setCategories(prev => prev.filter(c => c.id !== id));
     } else {
@@ -548,39 +455,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   return (
-    <AppContext.Provider
-      value={{
-        user,
-        expenses,
-        filteredExpenses,
-        budgets,
-        loading,
-        initialLoading,
-        error,
-        currency,
-        currencySymbol: CURRENCY_SYMBOLS[currency],
-        language,
-        settings,
-        notifications,
-        categories,
-        login,
-        logout,
-        setCurrency,
-        setLanguage,
-        updateSettings,
-        fetchExpenses,
-        fetchCategories,
-        addExpense,
-        updateExpense,
-        deleteExpense,
-        updateBudget,
-        deleteBudget,
-        addCategory,
-        deleteCategory,
-        formatAmount,
-        t
-      }}
-    >
+    <AppContext.Provider value={{
+      user, expenses, filteredExpenses, budgets, loading, initialLoading, error, currency,
+      currencySymbol: CURRENCY_SYMBOLS[currency],
+      language, settings, notifications, categories,
+      login, logout, setCurrency, setLanguage, updateSettings,
+      fetchExpenses, fetchCategories, addExpense, updateExpense,
+      deleteExpense, updateBudget, deleteBudget, addCategory, deleteCategory,
+      formatAmount, t
+    }}>
       {children}
     </AppContext.Provider>
   );
@@ -588,10 +471,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
 export const useApp = () => {
   const context = useContext(AppContext);
-
-  if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-
+  if (!context) throw new Error('useApp must be used within an AppProvider');
   return context;
 };

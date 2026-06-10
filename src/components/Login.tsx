@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wallet, Mail, Lock, User as UserIcon, ArrowRight } from 'lucide-react';
+import { Wallet, Mail, Lock, User as UserIcon, ArrowRight, PlayCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getApiUrl } from '../lib/api';
 
@@ -18,6 +18,7 @@ import ThemeToggle from './ThemeToggle';
 export default function Login({ onLogin }: LoginProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,6 +52,30 @@ export default function Login({ onLogin }: LoginProps) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(getApiUrl('/api/demo/login'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Could not start demo mode');
+      }
+
+      onLogin(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setDemoLoading(false);
     }
   };
 
@@ -193,7 +218,7 @@ export default function Login({ onLogin }: LoginProps) {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || demoLoading}
               className="w-full bg-primary text-white py-4.5 rounded-2xl font-extrabold text-[16px] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-50 mt-4 cursor-pointer"
             >
               {loading ? (
@@ -206,6 +231,24 @@ export default function Login({ onLogin }: LoginProps) {
               )}
             </button>
           </form>
+
+          {isLogin && (
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading || demoLoading}
+              className="w-full mt-4 bg-bg text-text-main py-4 rounded-2xl font-extrabold text-sm border border-border flex items-center justify-center gap-3 transition-all hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              {demoLoading ? (
+                <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <PlayCircle size={20} />
+                  <span className="uppercase tracking-widest">Continue as Demo User</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         <div className="text-center mt-12 space-y-4">
@@ -217,4 +260,3 @@ export default function Login({ onLogin }: LoginProps) {
     </div>
   );
 }
-

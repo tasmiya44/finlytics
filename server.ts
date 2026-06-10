@@ -47,6 +47,83 @@ interface CategorySummary {
   transactionCount: number;
 }
 
+const DEMO_USER = {
+  name: 'Demo User',
+  email: 'demo@finlytics.app',
+  password: 'demo123'
+};
+
+function formatDemoDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getDemoSeedData() {
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  const daysAgo = (days: number) => {
+    const date = new Date(now);
+    date.setDate(now.getDate() - days);
+    return formatDemoDate(date);
+  };
+
+  const currentMonthDate = (day: number) => {
+    const safeDay = Math.min(day, now.getDate());
+    return formatDemoDate(new Date(now.getFullYear(), now.getMonth(), safeDay));
+  };
+
+  const previousMonthDate = (day: number) => {
+    const previous = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    previous.setDate(Math.min(day, lastDay));
+    return formatDemoDate(previous);
+  };
+
+  const transactions = [
+    { description: 'Morning coffee - Blue Bottle', amount: 180, category: 'Food', date: daysAgo(0) },
+    { description: 'Metro card recharge', amount: 500, category: 'Transport', date: daysAgo(0) },
+    { description: 'Lunch at cafe', amount: 420, category: 'Food', date: daysAgo(1) },
+    { description: 'Coffee with client', amount: 210, category: 'Food', date: daysAgo(1) },
+    { description: 'Streaming subscription', amount: 649, category: 'Entertainment', date: daysAgo(2) },
+    { description: 'Coffee and muffin', amount: 260, category: 'Food', date: daysAgo(2) },
+    { description: 'Ride share home', amount: 360, category: 'Transport', date: daysAgo(3) },
+    { description: 'Grocery top-up', amount: 980, category: 'Food', date: daysAgo(3) },
+    { description: 'New work shirt', amount: 1850, category: 'Shopping', date: daysAgo(4) },
+    { description: 'Evening coffee', amount: 160, category: 'Food', date: daysAgo(4) },
+    { description: 'Movie tickets', amount: 760, category: 'Entertainment', date: daysAgo(5) },
+    { description: 'Coffee beans', amount: 540, category: 'Food', date: daysAgo(5) },
+    { description: 'Bus pass', amount: 700, category: 'Transport', date: daysAgo(6) },
+    { description: 'Online accessories order', amount: 2450, category: 'Shopping', date: currentMonthDate(3) },
+    { description: 'Apartment rent', amount: 28000, category: 'Rent', date: currentMonthDate(1) },
+    { description: 'Electricity bill', amount: 1850, category: 'Utilities', date: currentMonthDate(5) },
+    { description: 'Weekend dinner', amount: 1250, category: 'Food', date: currentMonthDate(6) },
+    { description: 'Internet bill', amount: 999, category: 'Utilities', date: currentMonthDate(7) },
+    { description: 'Bowling night', amount: 950, category: 'Entertainment', date: currentMonthDate(8) },
+    { description: 'Fuel refill', amount: 1200, category: 'Transport', date: currentMonthDate(9) },
+    { description: 'Previous month rent', amount: 28000, category: 'Rent', date: previousMonthDate(1) },
+    { description: 'Previous month groceries', amount: 2100, category: 'Food', date: previousMonthDate(5) },
+    { description: 'Previous month coffee runs', amount: 720, category: 'Food', date: previousMonthDate(12) },
+    { description: 'Previous month shopping', amount: 3150, category: 'Shopping', date: previousMonthDate(14) },
+    { description: 'Previous month utilities', amount: 2350, category: 'Utilities', date: previousMonthDate(16) },
+    { description: 'Previous month transport', amount: 1650, category: 'Transport', date: previousMonthDate(18) },
+    { description: 'Concert tickets', amount: 1800, category: 'Entertainment', date: previousMonthDate(21) },
+    { description: 'Previous month dining out', amount: 1450, category: 'Food', date: previousMonthDate(24) }
+  ];
+
+  const budgets = [
+    { category: 'Food', amount: 3500, month: currentMonth, year: currentYear },
+    { category: 'Shopping', amount: 4200, month: currentMonth, year: currentYear },
+    { category: 'Entertainment', amount: 3000, month: currentMonth, year: currentYear },
+    { category: 'Transport', amount: 3200, month: currentMonth, year: currentYear }
+  ];
+
+  return { transactions, budgets };
+}
+
 async function startServer() {
   try {
     const db = await initDb();
@@ -56,7 +133,7 @@ async function startServer() {
     // Validate FRONTEND_URL to ensure it's not mistakenly set to a database URL
     let frontendOrigin: string | string[] = '*';
     const rawFrontendUrl = process.env.FRONTEND_URL;
-
+    
     if (rawFrontendUrl) {
       if (rawFrontendUrl.startsWith('postgres://') || rawFrontendUrl.startsWith('postgresql://')) {
         console.warn('\x1b[31m%s\x1b[0m', '---------------------------------------------------------');
@@ -66,8 +143,8 @@ async function startServer() {
         console.warn('\x1b[33m%s\x1b[0m', '  1. DATABASE_URL = ' + rawFrontendUrl);
         console.warn('\x1b[33m%s\x1b[0m', '  2. FRONTEND_URL = your actual frontend domain (e.g. https://your-vercel-app.vercel.app)');
         console.warn('\x1b[31m%s\x1b[0m', '---------------------------------------------------------');
-
-
+        
+        
         if (!process.env.DATABASE_URL) {
           process.env.DATABASE_URL = rawFrontendUrl;
         }
@@ -150,6 +227,85 @@ async function startServer() {
       }
     });
 
+    app.post('/api/demo/login', async (req, res) => {
+      try {
+        const hashedPassword = await bcrypt.hash(DEMO_USER.password, 10);
+        const { transactions, budgets } = getDemoSeedData();
+
+        const transactionPlaceholders = transactions.map(() => '(?, ?, ?, ?)').join(', ');
+        const transactionParams = transactions.flatMap(transaction => [
+          transaction.amount,
+          transaction.category,
+          transaction.date,
+          transaction.description
+        ]);
+
+        const budgetPlaceholders = budgets.map(() => '(?, ?, ?, ?)').join(', ');
+        const budgetParams = budgets.flatMap(budget => [
+          budget.category,
+          budget.amount,
+          budget.month,
+          budget.year
+        ]);
+
+        const rows = await db.all(`
+          WITH demo_user AS (
+            INSERT INTO users (name, email, password)
+            VALUES (?, ?, ?)
+            ON CONFLICT (email) DO UPDATE SET
+              name = EXCLUDED.name,
+              password = EXCLUDED.password
+            RETURNING id, name, email
+          ),
+          deleted_transactions AS (
+            DELETE FROM transactions
+            WHERE user_id = (SELECT id FROM demo_user)
+          ),
+          deleted_budgets AS (
+            DELETE FROM budgets
+            WHERE user_id = (SELECT id FROM demo_user)
+          ),
+          inserted_transactions AS (
+            INSERT INTO transactions (amount, category, date, description, user_id, receipt_url)
+            SELECT
+              values_table.amount::numeric,
+              values_table.category,
+              values_table.date::date,
+              values_table.description,
+              demo_user.id,
+              NULL
+            FROM (VALUES ${transactionPlaceholders}) AS values_table(amount, category, date, description), demo_user
+            RETURNING id
+          ),
+          inserted_budgets AS (
+            INSERT INTO budgets (user_id, category, category_id, monthly_limit, month, year)
+            SELECT
+              demo_user.id,
+              values_table.category,
+              NULL,
+              values_table.amount::numeric,
+              values_table.month::integer,
+              values_table.year::integer
+            FROM (VALUES ${budgetPlaceholders}) AS values_table(category, amount, month, year), demo_user
+            RETURNING id
+          )
+          SELECT id, name, email FROM demo_user
+        `, [DEMO_USER.name, DEMO_USER.email, hashedPassword, ...transactionParams, ...budgetParams]) as User[];
+
+        const user = rows[0];
+
+        if (!user?.id) {
+          return res.status(500).json({ message: 'Could not initialize demo user' });
+        }
+
+        verifiedUsersCache.add(user.id);
+        res.json({ id: user.id, name: user.name, email: user.email });
+      } catch (err) {
+        console.error('Demo Login Error:', err);
+        res.status(500).json({ message: 'Error preparing demo account' });
+      }
+    });
+
     // --- Expenses API ---
     const checkUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
       const userIdStr = req.headers['x-user-id'];
@@ -157,7 +313,7 @@ async function startServer() {
         return res.status(401).json({ message: 'User ID required' });
       }
       const userId = parseInt(userIdStr as string);
-
+      
       // Use cached verified users to reduce database lookups.
       if (verifiedUsersCache.has(userId)) {
         (req as any).userId = userId;
@@ -183,7 +339,7 @@ async function startServer() {
     app.get('/api/expenses/category-summary', checkUser, async (req, res) => {
       const userId = (req as any).userId;
       const { timeFilter } = req.query;
-
+      
       let dateCondition = '';
       const params: any[] = [userId];
 
@@ -196,7 +352,7 @@ async function startServer() {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const end = new Date(now.getFullYear(), now.getMonth(), 0);
-
+        
         dateCondition = ' AND date >= ? AND date <= ?';
         params.push(start.toISOString().split('T')[0]);
         params.push(end.toISOString().split('T')[0]);
@@ -215,7 +371,7 @@ async function startServer() {
         `, params) as CategorySummary[];
 
         const totalOverall = summary.reduce((acc, curr) => acc + curr.totalAmount, 0);
-
+        
         const result = summary.map(item => ({
           category: item.category,
           totalAmount: parseFloat(item.totalAmount.toFixed(2)),
@@ -285,11 +441,11 @@ async function startServer() {
         if (!multerReq.file) {
           return res.status(400).json({ message: 'No file uploaded' });
         }
-
+        
         const fileUrl = `/uploads/${multerReq.file.filename}`;
-
+        
         // Return uploaded receipt file details.
-        res.json({
+        res.json({ 
           url: fileUrl,
           filename: multerReq.file.filename
         });
@@ -423,7 +579,7 @@ async function startServer() {
       const userId = (req as any).userId;
       try {
         const category = await db.get('SELECT id, name, user_id FROM categories WHERE id = ? AND (user_id = ? OR user_id = 0)', [id, userId]) as any;
-
+        
         if (!category) return res.status(404).json({ message: 'Category not found' });
         if (category.user_id === 0) return res.status(403).json({ message: 'Cannot delete default categories' });
 
@@ -441,20 +597,11 @@ async function startServer() {
     });
 
     // --- Insights API ---
-    // --- Insights API ---
     app.get('/api/insights', checkUser, async (req, res) => {
       const userId = (req as any).userId;
-
       try {
-        const expenses = await db.all(
-          'SELECT id, user_id as userId, amount, category, date, description FROM transactions WHERE user_id = ?',
-          [userId]
-        ) as Transaction[];
-
-        const budgets = await db.all(
-          'SELECT id, user_id as userId, monthly_limit as amount, category, month, year FROM budgets WHERE user_id = ?',
-          [userId]
-        ) as Budget[];
+        const expenses = await db.all('SELECT id, user_id as userId, amount, category, date, description FROM transactions WHERE user_id = ?', [userId]) as Transaction[];
+        const budgets = await db.all('SELECT id, user_id as userId, monthly_limit as amount, category, month, year FROM budgets WHERE user_id = ?', [userId]) as Budget[];
 
         const now = new Date();
         const currentMonth = now.getMonth();
@@ -470,135 +617,102 @@ async function startServer() {
         }
 
         const insights: string[] = [];
+        const currentMonthTotal = currentMonthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
-        const currentMonthTotal = currentMonthExpenses.reduce(
-          (sum, e) => sum + Number(e.amount || 0),
-          0
-        );
-
+        // 1. Group current month by category
         const categoryTotals: Record<string, number> = {};
-
         currentMonthExpenses.forEach(e => {
-          categoryTotals[e.category] =
-            (categoryTotals[e.category] || 0) + Number(e.amount || 0);
+          categoryTotals[e.category] = (categoryTotals[e.category] || 0) + Number(e.amount);
         });
 
-        const sortedCategories = Object.entries(categoryTotals).sort(
-          (a, b) => b[1] - a[1]
-        );
-
-        budgets.forEach(budget => {
-          const spent = categoryTotals[budget.category] || 0;
-          const limit = Number(budget.amount || 0);
-
-          if (!limit) return;
-
-          const usage = (spent / limit) * 100;
-
-          if (usage >= 100) {
-            insights.push(
-              `Critical Budget Alert: ${budget.category} budget exceeded by ₹${Math.round(
-                spent - limit
-              ).toLocaleString('en-IN')}.`
-            );
-          } else if (usage >= 80) {
-            insights.push(
-              `Budget Warning: ${budget.category} is already at ${Math.round(
-                usage
-              )}% utilization.`
-            );
-          }
-        });
-
-        if (sortedCategories.length > 0 && currentMonthTotal > 0) {
-          const [topCategory, topAmount] = sortedCategories[0];
-          const share = Math.round((topAmount / currentMonthTotal) * 100);
-
-          insights.push(
-            `${topCategory} is your highest spending category and accounts for ${share}% of total spending this month.`
-          );
-        }
-
-        const exceededCount = budgets.filter(budget => {
-          const spent = categoryTotals[budget.category] || 0;
-          const limit = Number(budget.amount || 0);
-
-          return limit > 0 && spent > limit;
-        }).length;
-
-        if (exceededCount > 1) {
-          insights.push(
-            `${exceededCount} budget categories have exceeded their limits this month.`
-          );
-        }
-
-        const lastMonth = new Date(currentYear, currentMonth - 1);
-
-        const lastMonthExpenses = expenses.filter(e => {
-          const d = new Date(e.date);
-
-          return (
-            d.getMonth() === lastMonth.getMonth() &&
-            d.getFullYear() === lastMonth.getFullYear()
-          );
-        });
-
-        const lastMonthTotal = lastMonthExpenses.reduce(
-          (sum, e) => sum + Number(e.amount || 0),
-          0
-        );
-
-        if (lastMonthTotal > 0) {
-          const change =
-            ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
-
-          if (change >= 10) {
-            insights.push(
-              `Spending is up ${Math.round(change)}% compared to last month.`
-            );
-          } else if (change <= -10) {
-            insights.push(
-              `Spending is down ${Math.abs(
-                Math.round(change)
-              )}% compared to last month.`
-            );
-          }
-        }
-
-        const coffeeExpenses = currentMonthExpenses.filter(
-          e =>
-            e.description &&
-            e.description.toLowerCase().includes('coffee')
-        );
-
-        if (coffeeExpenses.length >= 3) {
-          const totalCoffee = coffeeExpenses.reduce(
-            (sum, e) => sum + Number(e.amount || 0),
-            0
-          );
-
-          insights.push(
-            `${coffeeExpenses.length} coffee purchases totaling ₹${Math.round(
-              totalCoffee
-            ).toLocaleString('en-IN')} this month.`
-          );
-        }
-
+        // 2. Highest Spending Category
+        const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
         if (sortedCategories.length > 0) {
-          const [topCategory, topAmount] = sortedCategories[0];
+          insights.push(`${sortedCategories[0][0]} is your highest spending category this month.`);
+        }
 
-          if (topAmount > 1000) {
-            insights.push(
-              `Reducing ${topCategory} spending by 10% could save approximately ₹${Math.round(
-                topAmount * 0.1
-              ).toLocaleString('en-IN')} this month.`
-            );
+        const frequentCoffeeCount = currentMonthExpenses.filter(e => e.description.toLowerCase().includes('coffee')).length;
+        if (frequentCoffeeCount >= 3) {
+          insights.push(`Frequent purchase detected: coffee appears in ${frequentCoffeeCount} transactions this month.`);
+        }
+
+        // 3. Budget Thresholds
+        budgets.forEach(b => {
+          const spent = categoryTotals[b.category] || 0;
+          const budgetAmount = Number(b.amount);
+          if (budgetAmount > 0) {
+            if (spent > budgetAmount) {
+              insights.push(`Warning: You have exceeded your ${b.category} budget by ₹${(spent - budgetAmount).toLocaleString('en-IN')}.`);
+            } else if (spent >= budgetAmount * 0.8) {
+              insights.push(`Alert: You are close to exceeding your ${b.category} budget.`);
+            }
+          }
+        });
+
+        // 4. Weekly Comparison (Current week vs Last week) - only if enough data exists
+        if (currentMonthExpenses.length >= 3) {
+          const startOfThisWeek = new Date(now);
+          startOfThisWeek.setDate(now.getDate() - now.getDay());
+          startOfThisWeek.setHours(0, 0, 0, 0);
+
+          const startOfLastWeek = new Date(startOfThisWeek);
+          startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+
+          const categoryWeekly: Record<string, { this: number; last: number }> = {};
+          
+          currentMonthExpenses.forEach(e => {
+            const expenseDate = new Date(e.date);
+            const cat = e.category;
+            if (!categoryWeekly[cat]) categoryWeekly[cat] = { this: 0, last: 0 };
+
+            if (expenseDate >= startOfThisWeek) {
+              categoryWeekly[cat].this += Number(e.amount);
+            } else if (expenseDate >= startOfLastWeek && expenseDate < startOfThisWeek) {
+              categoryWeekly[cat].last += Number(e.amount);
+            }
+          });
+
+          Object.entries(categoryWeekly).forEach(([cat, amounts]) => {
+            if (amounts.last > 0 && amounts.this > amounts.last) {
+              const diff = amounts.this - amounts.last;
+              const percent = Math.round((diff / amounts.last) * 100);
+              if (percent >= 10) {
+                insights.push(`You spent ${percent}% more on ${cat} this week compared to last week.`);
+              }
+            }
+          });
+        }
+
+        // 5. Weekend vs Weekday (Patterns)
+        if (currentMonthExpenses.length >= 5) {
+          let weekendSpending = 0;
+          let weekdaySpending = 0;
+          currentMonthExpenses.forEach(e => {
+            const d = new Date(e.date).getDay();
+            if (d === 0 || d === 6) {
+              weekendSpending += Number(e.amount);
+            } else {
+              weekdaySpending += Number(e.amount);
+            }
+          });
+
+          if (weekendSpending > weekdaySpending * 1.5) {
+            insights.push("Pattern detected: Your spending is significantly higher on weekends.");
           }
         }
 
-        res.json(insights.slice(0, 6));
+        // 6. Savings Suggestion (Data-driven Tip)
+        if (sortedCategories.length > 0 && currentMonthExpenses.length >= 3) {
+          const topCat = sortedCategories[0][0];
+          const topAmt = sortedCategories[0][1];
+          // Suggest saving 10% if category spending is significant (>20% of total)
+          if (topAmt > currentMonthTotal * 0.2 && topAmt > 1000) {
+            insights.push(`Tip: Reducing your ${topCat} spending by just 10% would save you ₹${Math.round(topAmt * 0.1)} this month.`);
+          }
+        }
+
+        res.json(insights.slice(0, 5)); // Return top 5 insights
       } catch (err) {
-        console.error('Error generating insights:', err);
         res.status(500).json({ message: 'Error generating insights' });
       }
     });
@@ -630,12 +744,12 @@ async function startServer() {
           });
         }
 
-        const totalSpent = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+        const totalSpent = monthlyExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
         const categoryMap: Record<string, number> = {};
         const categoryCountMap: Record<string, number> = {};
 
         monthlyExpenses.forEach(e => {
-          categoryMap[e.category] = (categoryMap[e.category] || 0) + e.amount;
+          categoryMap[e.category] = (categoryMap[e.category] || 0) + Number(e.amount);
           categoryCountMap[e.category] = (categoryCountMap[e.category] || 0) + 1;
         });
 
@@ -645,11 +759,12 @@ async function startServer() {
 
         const budgetStatus = budgets.map(b => {
           const spent = categoryMap[b.category] || 0;
+          const limit = Number(b.amount);
           return {
             category: b.category,
-            limit: b.amount,
+            limit,
             spent,
-            percentage: Math.round((spent / b.amount) * 100)
+            percentage: Math.round((spent / limit) * 100)
           };
         });
 
@@ -743,7 +858,7 @@ async function startServer() {
         doc.fontSize(16).text('Executive Summary', { underline: true });
         doc.fontSize(12).text(`Total Spending: INR ${totalSpent.toLocaleString()}`);
         doc.text(`Total Transactions: ${monthlyExpenses.length}`);
-
+        
         const sortedCats = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
         if (sortedCats.length > 0) {
           doc.text(`Highest Spending Category: ${sortedCats[0][0]} (INR ${sortedCats[0][1].toLocaleString()})`);
@@ -756,7 +871,7 @@ async function startServer() {
         for (const [cat, amt] of sortedCats) {
           const percent = ((amt / totalSpent) * 100).toFixed(1);
           doc.fontSize(12).text(`${cat}: INR ${amt.toLocaleString()} (${percent}%)`);
-
+          
           // Simple horizontal bar chart representation
           const barWidth = 300 * (amt / totalSpent);
           doc.rect(150, doc.y - 12, barWidth, 10).fill('#6DA5FF');
@@ -780,7 +895,7 @@ async function startServer() {
         // Transactions Table
         doc.fontSize(16).text('Transaction History', { underline: true });
         doc.moveDown();
-
+        
         // Table Header
         const startY = doc.y;
         doc.fontSize(10).font('Helvetica-Bold').text('Date', 50, startY);
@@ -788,7 +903,7 @@ async function startServer() {
         doc.text('Category', 350, startY);
         doc.text('Amount', 480, startY, { align: 'right' });
         doc.moveTo(50, startY + 15).lineTo(550, startY + 15).stroke();
-
+        
         let rowY = startY + 25;
         doc.font('Helvetica'); // Reset to regular
         monthlyExpenses.forEach(e => {
@@ -819,7 +934,7 @@ async function startServer() {
         appType: 'spa',
       });
       app.use(vite.middlewares);
-    }
+    } 
 
     app.listen(Number(PORT), '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
