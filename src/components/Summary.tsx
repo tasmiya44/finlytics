@@ -11,16 +11,19 @@ export default function Summary({ expenses }: { expenses: any[] }) {
     const d = new Date(e.date);
     return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
   });
-  
-  const monthlyTotal = monthlyExpenses.reduce((acc, curr) => acc + curr.amount, 0);
-  
+
+  const monthlyTotal = monthlyExpenses.reduce(
+    (acc, curr) => acc + Number(curr.amount || 0),
+    0
+  );
+
   const highestCategory = Object.entries(
     monthlyExpenses.reduce((acc: Record<string, number>, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + Number(curr.amount);
       return acc;
     }, {} as Record<string, number>)
   ).sort((a: any, b: any) => Number(b[1]) - Number(a[1]))[0]?.[0] || 'None';
-  
+
   const stats = [
     {
       label: t('summary.transactions'),
