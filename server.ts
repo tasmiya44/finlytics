@@ -56,7 +56,7 @@ async function startServer() {
     // Validate FRONTEND_URL to ensure it's not mistakenly set to a database URL
     let frontendOrigin: string | string[] = '*';
     const rawFrontendUrl = process.env.FRONTEND_URL;
-    
+
     if (rawFrontendUrl) {
       if (rawFrontendUrl.startsWith('postgres://') || rawFrontendUrl.startsWith('postgresql://')) {
         console.warn('\x1b[31m%s\x1b[0m', '---------------------------------------------------------');
@@ -66,8 +66,8 @@ async function startServer() {
         console.warn('\x1b[33m%s\x1b[0m', '  1. DATABASE_URL = ' + rawFrontendUrl);
         console.warn('\x1b[33m%s\x1b[0m', '  2. FRONTEND_URL = your actual frontend domain (e.g. https://your-vercel-app.vercel.app)');
         console.warn('\x1b[31m%s\x1b[0m', '---------------------------------------------------------');
-        
-        
+
+
         if (!process.env.DATABASE_URL) {
           process.env.DATABASE_URL = rawFrontendUrl;
         }
@@ -157,7 +157,7 @@ async function startServer() {
         return res.status(401).json({ message: 'User ID required' });
       }
       const userId = parseInt(userIdStr as string);
-      
+
       // Use cached verified users to reduce database lookups.
       if (verifiedUsersCache.has(userId)) {
         (req as any).userId = userId;
@@ -183,7 +183,7 @@ async function startServer() {
     app.get('/api/expenses/category-summary', checkUser, async (req, res) => {
       const userId = (req as any).userId;
       const { timeFilter } = req.query;
-      
+
       let dateCondition = '';
       const params: any[] = [userId];
 
@@ -196,7 +196,7 @@ async function startServer() {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const end = new Date(now.getFullYear(), now.getMonth(), 0);
-        
+
         dateCondition = ' AND date >= ? AND date <= ?';
         params.push(start.toISOString().split('T')[0]);
         params.push(end.toISOString().split('T')[0]);
@@ -215,7 +215,7 @@ async function startServer() {
         `, params) as CategorySummary[];
 
         const totalOverall = summary.reduce((acc, curr) => acc + curr.totalAmount, 0);
-        
+
         const result = summary.map(item => ({
           category: item.category,
           totalAmount: parseFloat(item.totalAmount.toFixed(2)),
@@ -285,11 +285,11 @@ async function startServer() {
         if (!multerReq.file) {
           return res.status(400).json({ message: 'No file uploaded' });
         }
-        
+
         const fileUrl = `/uploads/${multerReq.file.filename}`;
-        
+
         // Return uploaded receipt file details.
-        res.json({ 
+        res.json({
           url: fileUrl,
           filename: multerReq.file.filename
         });
@@ -423,7 +423,7 @@ async function startServer() {
       const userId = (req as any).userId;
       try {
         const category = await db.get('SELECT id, name, user_id FROM categories WHERE id = ? AND (user_id = ? OR user_id = 0)', [id, userId]) as any;
-        
+
         if (!category) return res.status(404).json({ message: 'Category not found' });
         if (category.user_id === 0) return res.status(403).json({ message: 'Cannot delete default categories' });
 
@@ -441,11 +441,20 @@ async function startServer() {
     });
 
     // --- Insights API ---
+    // --- Insights API ---
     app.get('/api/insights', checkUser, async (req, res) => {
       const userId = (req as any).userId;
+
       try {
-        const expenses = await db.all('SELECT id, user_id as userId, amount, category, date, description FROM transactions WHERE user_id = ?', [userId]) as Transaction[];
-        const budgets = await db.all('SELECT id, user_id as userId, monthly_limit as amount, category, month, year FROM budgets WHERE user_id = ?', [userId]) as Budget[];
+        const expenses = await db.all(
+          'SELECT id, user_id as userId, amount, category, date, description FROM transactions WHERE user_id = ?',
+          [userId]
+        ) as Transaction[];
+
+        const budgets = await db.all(
+          'SELECT id, user_id as userId, monthly_limit as amount, category, month, year FROM budgets WHERE user_id = ?',
+          [userId]
+        ) as Budget[];
 
         const now = new Date();
         const currentMonth = now.getMonth();
@@ -461,96 +470,135 @@ async function startServer() {
         }
 
         const insights: string[] = [];
-        const currentMonthTotal = currentMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-        // 1. Group current month by category
+        const currentMonthTotal = currentMonthExpenses.reduce(
+          (sum, e) => sum + Number(e.amount || 0),
+          0
+        );
+
         const categoryTotals: Record<string, number> = {};
+
         currentMonthExpenses.forEach(e => {
-          categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+          categoryTotals[e.category] =
+            (categoryTotals[e.category] || 0) + Number(e.amount || 0);
         });
 
-        // 2. Highest Spending Category
-        const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+        const sortedCategories = Object.entries(categoryTotals).sort(
+          (a, b) => b[1] - a[1]
+        );
+
+        budgets.forEach(budget => {
+          const spent = categoryTotals[budget.category] || 0;
+          const limit = Number(budget.amount || 0);
+
+          if (!limit) return;
+
+          const usage = (spent / limit) * 100;
+
+          if (usage >= 100) {
+            insights.push(
+              `Critical Budget Alert: ${budget.category} budget exceeded by ₹${Math.round(
+                spent - limit
+              ).toLocaleString('en-IN')}.`
+            );
+          } else if (usage >= 80) {
+            insights.push(
+              `Budget Warning: ${budget.category} is already at ${Math.round(
+                usage
+              )}% utilization.`
+            );
+          }
+        });
+
+        if (sortedCategories.length > 0 && currentMonthTotal > 0) {
+          const [topCategory, topAmount] = sortedCategories[0];
+          const share = Math.round((topAmount / currentMonthTotal) * 100);
+
+          insights.push(
+            `${topCategory} is your highest spending category and accounts for ${share}% of total spending this month.`
+          );
+        }
+
+        const exceededCount = budgets.filter(budget => {
+          const spent = categoryTotals[budget.category] || 0;
+          const limit = Number(budget.amount || 0);
+
+          return limit > 0 && spent > limit;
+        }).length;
+
+        if (exceededCount > 1) {
+          insights.push(
+            `${exceededCount} budget categories have exceeded their limits this month.`
+          );
+        }
+
+        const lastMonth = new Date(currentYear, currentMonth - 1);
+
+        const lastMonthExpenses = expenses.filter(e => {
+          const d = new Date(e.date);
+
+          return (
+            d.getMonth() === lastMonth.getMonth() &&
+            d.getFullYear() === lastMonth.getFullYear()
+          );
+        });
+
+        const lastMonthTotal = lastMonthExpenses.reduce(
+          (sum, e) => sum + Number(e.amount || 0),
+          0
+        );
+
+        if (lastMonthTotal > 0) {
+          const change =
+            ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
+
+          if (change >= 10) {
+            insights.push(
+              `Spending is up ${Math.round(change)}% compared to last month.`
+            );
+          } else if (change <= -10) {
+            insights.push(
+              `Spending is down ${Math.abs(
+                Math.round(change)
+              )}% compared to last month.`
+            );
+          }
+        }
+
+        const coffeeExpenses = currentMonthExpenses.filter(
+          e =>
+            e.description &&
+            e.description.toLowerCase().includes('coffee')
+        );
+
+        if (coffeeExpenses.length >= 3) {
+          const totalCoffee = coffeeExpenses.reduce(
+            (sum, e) => sum + Number(e.amount || 0),
+            0
+          );
+
+          insights.push(
+            `${coffeeExpenses.length} coffee purchases totaling ₹${Math.round(
+              totalCoffee
+            ).toLocaleString('en-IN')} this month.`
+          );
+        }
+
         if (sortedCategories.length > 0) {
-          insights.push(`${sortedCategories[0][0]} is your highest spending category this month.`);
-        }
+          const [topCategory, topAmount] = sortedCategories[0];
 
-        // 3. Weekly Comparison (Current week vs Last week) - only if enough data exists
-        if (currentMonthExpenses.length >= 3) {
-          const startOfThisWeek = new Date(now);
-          startOfThisWeek.setDate(now.getDate() - now.getDay());
-          startOfThisWeek.setHours(0, 0, 0, 0);
-
-          const startOfLastWeek = new Date(startOfThisWeek);
-          startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
-
-          const categoryWeekly: Record<string, { this: number; last: number }> = {};
-          
-          currentMonthExpenses.forEach(e => {
-            const expenseDate = new Date(e.date);
-            const cat = e.category;
-            if (!categoryWeekly[cat]) categoryWeekly[cat] = { this: 0, last: 0 };
-
-            if (expenseDate >= startOfThisWeek) {
-              categoryWeekly[cat].this += e.amount;
-            } else if (expenseDate >= startOfLastWeek && expenseDate < startOfThisWeek) {
-              categoryWeekly[cat].last += e.amount;
-            }
-          });
-
-          Object.entries(categoryWeekly).forEach(([cat, amounts]) => {
-            if (amounts.last > 0 && amounts.this > amounts.last) {
-              const diff = amounts.this - amounts.last;
-              const percent = Math.round((diff / amounts.last) * 100);
-              if (percent >= 10) {
-                insights.push(`You spent ${percent}% more on ${cat} this week compared to last week.`);
-              }
-            }
-          });
-        }
-
-        // 4. Budget Thresholds
-        budgets.forEach(b => {
-          const spent = categoryTotals[b.category] || 0;
-          if (b.amount > 0) {
-            if (spent > b.amount) {
-              insights.push(`Warning: You have exceeded your ${b.category} budget by ₹${(spent - b.amount).toLocaleString('en-IN')}.`);
-            } else if (spent >= b.amount * 0.8) {
-              insights.push(`Alert: You are close to exceeding your ${b.category} budget.`);
-            }
-          }
-        });
-
-        // 5. Weekend vs Weekday (Patterns)
-        if (currentMonthExpenses.length >= 5) {
-          let weekendSpending = 0;
-          let weekdaySpending = 0;
-          currentMonthExpenses.forEach(e => {
-            const d = new Date(e.date).getDay();
-            if (d === 0 || d === 6) {
-              weekendSpending += e.amount;
-            } else {
-              weekdaySpending += e.amount;
-            }
-          });
-
-          if (weekendSpending > weekdaySpending * 1.5) {
-            insights.push("Pattern detected: Your spending is significantly higher on weekends.");
+          if (topAmount > 1000) {
+            insights.push(
+              `Reducing ${topCategory} spending by 10% could save approximately ₹${Math.round(
+                topAmount * 0.1
+              ).toLocaleString('en-IN')} this month.`
+            );
           }
         }
 
-        // 6. Savings Suggestion (Data-driven Tip)
-        if (sortedCategories.length > 0 && currentMonthExpenses.length >= 3) {
-          const topCat = sortedCategories[0][0];
-          const topAmt = sortedCategories[0][1];
-          // Suggest saving 10% if category spending is significant (>20% of total)
-          if (topAmt > currentMonthTotal * 0.2 && topAmt > 1000) {
-            insights.push(`Tip: Reducing your ${topCat} spending by just 10% would save you ₹${Math.round(topAmt * 0.1)} this month.`);
-          }
-        }
-
-        res.json(insights.slice(0, 5)); // Return top 5 insights
+        res.json(insights.slice(0, 6));
       } catch (err) {
+        console.error('Error generating insights:', err);
         res.status(500).json({ message: 'Error generating insights' });
       }
     });
@@ -695,7 +743,7 @@ async function startServer() {
         doc.fontSize(16).text('Executive Summary', { underline: true });
         doc.fontSize(12).text(`Total Spending: INR ${totalSpent.toLocaleString()}`);
         doc.text(`Total Transactions: ${monthlyExpenses.length}`);
-        
+
         const sortedCats = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
         if (sortedCats.length > 0) {
           doc.text(`Highest Spending Category: ${sortedCats[0][0]} (INR ${sortedCats[0][1].toLocaleString()})`);
@@ -708,7 +756,7 @@ async function startServer() {
         for (const [cat, amt] of sortedCats) {
           const percent = ((amt / totalSpent) * 100).toFixed(1);
           doc.fontSize(12).text(`${cat}: INR ${amt.toLocaleString()} (${percent}%)`);
-          
+
           // Simple horizontal bar chart representation
           const barWidth = 300 * (amt / totalSpent);
           doc.rect(150, doc.y - 12, barWidth, 10).fill('#6DA5FF');
@@ -732,7 +780,7 @@ async function startServer() {
         // Transactions Table
         doc.fontSize(16).text('Transaction History', { underline: true });
         doc.moveDown();
-        
+
         // Table Header
         const startY = doc.y;
         doc.fontSize(10).font('Helvetica-Bold').text('Date', 50, startY);
@@ -740,7 +788,7 @@ async function startServer() {
         doc.text('Category', 350, startY);
         doc.text('Amount', 480, startY, { align: 'right' });
         doc.moveTo(50, startY + 15).lineTo(550, startY + 15).stroke();
-        
+
         let rowY = startY + 25;
         doc.font('Helvetica'); // Reset to regular
         monthlyExpenses.forEach(e => {
@@ -771,7 +819,7 @@ async function startServer() {
         appType: 'spa',
       });
       app.use(vite.middlewares);
-    } 
+    }
 
     app.listen(Number(PORT), '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
