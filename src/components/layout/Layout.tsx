@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, initialLoading } = useApp();
 
   return (
-    <div className="flex min-h-screen bg-bg selection:bg-primary/20 overflow-x-hidden">
+    <div className="min-h-screen bg-bg selection:bg-primary/20 overflow-x-clip">
       {user && initialLoading ? (
         <div className="flex-1 flex flex-col items-center justify-center min-h-screen px-4">
           <DashboardLoader name={user.name} />
@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsMobileOpen={setIsMobileMenuOpen}
           />
           
-          <div className="flex-1 flex flex-col min-w-0 w-full">
+          <div className={`flex min-h-screen flex-col min-w-0 w-full transition-[margin] duration-300 ${isCollapsed ? 'lg:ml-[80px]' : 'lg:ml-[260px]'}`}>
             <TopBar onMenuClick={() => setIsMobileMenuOpen(true)} />
             
             <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 sm:p-6 lg:p-10">
