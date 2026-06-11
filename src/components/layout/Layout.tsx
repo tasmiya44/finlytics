@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             setIsMobileOpen={setIsMobileMenuOpen}
           />
           
-          <div className={`flex min-h-screen flex-col min-w-0 w-full transition-[margin] duration-300 ${isCollapsed ? 'lg:ml-[80px]' : 'lg:ml-[260px]'}`}>
+          <div className={`flex min-h-screen flex-col min-w-0 transition-[margin] duration-300 ${isCollapsed ? 'lg:ml-[80px]' : 'lg:ml-[260px]'}`}>
             <TopBar onMenuClick={() => setIsMobileMenuOpen(true)} />
             
             <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 sm:p-6 lg:p-10">
