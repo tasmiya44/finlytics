@@ -10,13 +10,16 @@ import multer from 'multer';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import cors from 'cors';
+import { OAuth2Client } from 'google-auth-library';
 import { initDb } from './src/server/db.ts';
 
 interface User {
   id: number;
   name: string;
   email: string;
-  password?: string;
+  password?: string | null;
+  google_id?: string | null;
+  profile_picture?: string | null;
 }
 
 interface Transaction {
@@ -52,6 +55,12 @@ const DEMO_USER = {
   email: 'demo@finlytics.app',
   password: 'demo123'
 };
+
+const googleAuthClient = new OAuth2Client();
+
+function getGoogleClientId() {
+  return process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '';
+}
 
 function formatDemoDate(date: Date) {
   const year = date.getFullYear();
@@ -224,6 +233,77 @@ async function startServer() {
         res.json({ id: user.id, name: user.name, email: user.email });
       } catch (err) {
         res.status(500).json({ message: 'Login error' });
+      }
+    });
+
+    app.post('/api/auth/google', async (req, res) => {
+      const { credential } = req.body;
+      const googleClientId = getGoogleClientId();
+
+      if (!googleClientId) {
+        return res.status(500).json({ message: 'Google login is not configured' });
+      }
+
+      if (!credential || typeof credential !== 'string') {
+        return res.status(400).json({ message: 'Google credential is required' });
+      }
+
+      try {
+        const ticket = await googleAuthClient.verifyIdToken({
+          idToken: credential,
+          audience: googleClientId
+        });
+
+        const payload = ticket.getPayload();
+        const googleId = payload?.sub;
+        const email = payload?.email;
+        const emailVerified = payload?.email_verified;
+        const name = payload?.name || email?.split('@')[0] || 'Google User';
+        const profilePicture = payload?.picture || null;
+
+        if (!googleId || !email || !emailVerified) {
+          return res.status(401).json({ message: 'Google account could not be verified' });
+        }
+
+        let user = await db.get('SELECT id, name, email FROM users WHERE google_id = ?', [googleId]) as User | undefined;
+
+        if (!user) {
+          const existingUser = await db.get('SELECT id, name, email FROM users WHERE email = ?', [email]) as User | undefined;
+
+          if (existingUser) {
+            await db.run(
+              'UPDATE users SET google_id = ?, profile_picture = ?, name = COALESCE(NULLIF(name, \'\'), ?) WHERE id = ?',
+              [googleId, profilePicture, name, existingUser.id]
+            );
+            user = {
+              id: existingUser.id,
+              name: existingUser.name || name,
+              email: existingUser.email
+            };
+          } else {
+            const result = await db.run(
+              'INSERT INTO users (name, email, password, google_id, profile_picture) VALUES (?, ?, ?, ?, ?)',
+              [name, email, null, googleId, profilePicture]
+            );
+            user = { id: result.lastID, name, email };
+          }
+        } else {
+          await db.run(
+            'UPDATE users SET name = ?, email = ?, profile_picture = ? WHERE id = ?',
+            [name, email, profilePicture, user.id]
+          );
+          user = { id: user.id, name, email };
+        }
+
+        if (!user?.id) {
+          return res.status(500).json({ message: 'Could not create Google user session' });
+        }
+
+        verifiedUsersCache.add(user.id);
+        res.json({ id: user.id, name: user.name, email: user.email });
+      } catch (err) {
+        console.error('Google Login Error:', err);
+        res.status(401).json({ message: 'Invalid Google credential' });
       }
     });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Wallet, Mail, Lock, User as UserIcon, ArrowRight, PlayCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getApiUrl } from '../lib/api';
@@ -15,17 +15,106 @@ interface LoginProps {
 
 import ThemeToggle from './ThemeToggle';
 
+const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
+
 export default function Login({ onLogin }: LoginProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const googleButtonRef = useRef<HTMLDivElement | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: ''
   });
+
+  const handleGoogleCredential = useCallback(async (response: google.accounts.id.CredentialResponse) => {
+    if (!response.credential) {
+      setError('Google login did not return a credential');
+      return;
+    }
+
+    setGoogleLoading(true);
+    setError(null);
+
+    try {
+      const authResponse = await fetch(getApiUrl('/api/auth/google'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+
+      const data = await authResponse.json();
+
+      if (!authResponse.ok) {
+        throw new Error(data.message || 'Google login failed');
+      }
+
+      onLogin(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Google login failed');
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, [onLogin]);
+
+  useEffect(() => {
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!isLogin || !googleClientId || !googleButtonRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const renderGoogleButton = () => {
+      if (cancelled || !window.google?.accounts?.id || !googleButtonRef.current) {
+        return;
+      }
+
+      googleButtonRef.current.innerHTML = '';
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleCredential
+      });
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        theme: 'outline',
+        size: 'large',
+        type: 'standard',
+        text: 'continue_with',
+        shape: 'pill',
+        logo_alignment: 'left',
+        width: Math.min(360, googleButtonRef.current.offsetWidth || 360)
+      });
+    };
+
+    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
+
+    if (window.google?.accounts?.id) {
+      renderGoogleButton();
+    } else if (existingScript) {
+      existingScript.addEventListener('load', renderGoogleButton, { once: true });
+    } else {
+      const script = document.createElement('script');
+      script.src = GOOGLE_SCRIPT_SRC;
+      script.async = true;
+      script.defer = true;
+      script.onload = renderGoogleButton;
+      script.onerror = () => {
+        if (!cancelled) {
+          setError('Could not load Google login. Please try again.');
+        }
+      };
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLogin, handleGoogleCredential]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,7 +307,7 @@ export default function Login({ onLogin }: LoginProps) {
 
             <button
               type="submit"
-              disabled={loading || demoLoading}
+              disabled={loading || demoLoading || googleLoading}
               className="w-full bg-primary text-white py-4.5 rounded-2xl font-extrabold text-sm sm:text-[16px] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-50 mt-4 cursor-pointer"
             >
               {loading ? (
@@ -233,21 +322,43 @@ export default function Login({ onLogin }: LoginProps) {
           </form>
 
           {isLogin && (
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={loading || demoLoading}
-              className="w-full mt-4 bg-bg text-text-main py-4 rounded-2xl font-extrabold text-xs sm:text-sm border border-border flex items-center justify-center gap-3 transition-all hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 cursor-pointer"
-            >
-              {demoLoading ? (
-                <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="mt-4 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-text-muted opacity-60">or</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+
+              {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+                <div className={`w-full rounded-2xl overflow-hidden transition-opacity ${googleLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <div ref={googleButtonRef} className="flex min-h-[44px] w-full justify-center" />
+                </div>
               ) : (
-                <>
-                  <PlayCircle size={20} />
-                  <span className="uppercase tracking-[0.12em] sm:tracking-widest">Continue as Demo User</span>
-                </>
+                <button
+                  type="button"
+                  disabled
+                  className="w-full bg-bg text-text-muted py-4 rounded-2xl font-extrabold text-xs sm:text-sm border border-border flex items-center justify-center gap-3 opacity-60"
+                >
+                  <span className="uppercase tracking-[0.12em] sm:tracking-widest">Google Login Not Configured</span>
+                </button>
               )}
-            </button>
+
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                disabled={loading || demoLoading || googleLoading}
+                className="w-full bg-bg text-text-main py-4 rounded-2xl font-extrabold text-xs sm:text-sm border border-border flex items-center justify-center gap-3 transition-all hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                {demoLoading ? (
+                  <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <PlayCircle size={20} />
+                    <span className="uppercase tracking-[0.12em] sm:tracking-widest">Continue as Demo User</span>
+                  </>
+                )}
+              </button>
+            </div>
           )}
         </div>
 

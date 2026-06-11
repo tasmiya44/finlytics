@@ -51,7 +51,9 @@ export class PostgresDb {
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
+        password TEXT,
+        google_id TEXT,
+        profile_picture TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -88,6 +90,13 @@ export class PostgresDb {
       CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
       CREATE INDEX IF NOT EXISTS idx_budgets_user_id ON budgets(user_id);
       CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id);
+    `);
+
+    await this.pool.query(`
+      ALTER TABLE users ALTER COLUMN password DROP NOT NULL;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id TEXT;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id) WHERE google_id IS NOT NULL;
     `);
 
     const catCount = await this.pool.query('SELECT COUNT(*) as count FROM categories');
