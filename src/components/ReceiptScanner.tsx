@@ -18,6 +18,23 @@ interface ReceiptScannerProps {
 
 let genAI: GoogleGenerativeAI | null = null;
 
+function getStoredUserId() {
+  const storedUser =
+    localStorage.getItem('expense_tracker_user_v3') ||
+    localStorage.getItem('expense_tracker_user_v2');
+
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    const parsedUser = JSON.parse(storedUser);
+    return parsedUser?.id ? String(parsedUser.id) : null;
+  } catch {
+    return null;
+  }
+}
+
 function getGenAI(): GoogleGenerativeAI {
   if (!genAI) {
     const key = process.env.GEMINI_API_KEY;
@@ -58,13 +75,16 @@ export default function ReceiptScanner({ onScanComplete, onClose }: ReceiptScann
       const formData = new FormData();
       formData.append('receipt', file);
       
-      const storedUser = localStorage.getItem('expense_tracker_user_v2');
-      const userId = storedUser ? JSON.parse(storedUser).id : null;
+      const userId = getStoredUserId();
+
+      if (!userId) {
+        throw new Error('Authorization failed. Please sign in again.');
+      }
 
       const uploadRes = await fetch(getApiUrl('/api/ocr/scan'), {
         method: 'POST',
         headers: {
-          'x-user-id': userId?.toString() || '',
+          'x-user-id': userId,
         },
         body: formData
       });
