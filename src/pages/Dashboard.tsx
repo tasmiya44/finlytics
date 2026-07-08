@@ -23,6 +23,10 @@ export default function Dashboard() {
 
   if (!user) return null;
 
+  const currentHour = new Date().getHours();
+  const greeting = currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
+  const isDemoWorkspace = user.email === 'demo@finlytics.app';
+
   const getCurrentMonthExpenses = () => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -85,8 +89,10 @@ export default function Dashboard() {
     <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full min-w-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight">{t('dashboard.title')}</h1>
-          <p className="text-sm sm:text-base text-text-muted font-medium break-words">{t('dashboard.welcome')}, {user.name}! {t('dashboard.overview')}</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-text-main dark:text-white tracking-tight">{greeting} 👋</h1>
+          <p className="text-sm sm:text-base text-text-muted font-medium break-words">
+            {isDemoWorkspace ? 'Explore Mode · Demo Workspace' : `Welcome to Finlytics, ${user.name}.`} {t('dashboard.overview')}
+          </p>
         </div>
         <Link
           to="/transactions"

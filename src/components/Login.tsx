@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Wallet, Mail, Lock, User as UserIcon, ArrowRight, PlayCircle } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, ArrowRight, ArrowLeft, ShieldCheck, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { getApiUrl } from '../lib/api';
 
 interface User {
@@ -20,7 +21,6 @@ const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 export default function Login({ onLogin }: LoginProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -87,7 +87,7 @@ export default function Login({ onLogin }: LoginProps) {
         text: 'continue_with',
         shape: 'pill',
         logo_alignment: 'left',
-        width: Math.min(360, googleButtonRef.current.offsetWidth || 360)
+        width: Math.min(440, googleButtonRef.current.offsetWidth || 440)
       });
     };
 
@@ -121,8 +121,6 @@ export default function Login({ onLogin }: LoginProps) {
     setLoading(true);
     setError(null);
 
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-    
     try {
       const response = await fetch(getApiUrl(isLogin ? '/api/auth/login' : '/api/auth/register'), {
         method: 'POST',
@@ -144,78 +142,74 @@ export default function Login({ onLogin }: LoginProps) {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setDemoLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(getApiUrl('/api/demo/login'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Could not start demo mode');
-      }
-
-      onLogin(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setDemoLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 dark:opacity-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px]" />
-      </div>
+    <div className="auth-shell relative flex min-h-screen items-center justify-center bg-bg px-4 py-24 text-text-main transition-colors duration-300 sm:px-6 sm:py-28">
+      <Link
+        to="/"
+        className="absolute left-4 top-5 z-20 flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold text-text-muted transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:left-8 sm:top-8"
+      >
+        <ArrowLeft size={15} /> Back to Home
+      </Link>
 
-      <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-7">
         <ThemeToggle />
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-[440px] w-full relative z-10"
+      <motion.main
+        initial={{ opacity: 0, y: 20, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="relative z-10 w-full max-w-[520px]"
       >
-        <div className="text-center mb-8 sm:mb-10">
-          <motion.div 
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            className="inline-block bg-primary p-3.5 sm:p-4 rounded-[20px] sm:rounded-[22px] shadow-lg shadow-primary/30 mb-5 sm:mb-6"
+        <header className="mb-6 text-center sm:mb-7">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.78 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 190, damping: 16, delay: 0.08 }}
+            className="auth-logo-glow mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/25"
           >
-            <Wallet className="text-white" size={32} />
+            <TrendingUp size={27} strokeWidth={2.4} />
           </motion.div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight leading-tight px-2">
-            {isLogin ? 'Welcome to Finlytics' : 'Create your Finlytics account'}
-          </h1>
-          <p className="text-sm sm:text-base text-text-muted font-medium mt-2 px-4">Manage your finances with clarity and precision</p>
-        </div>
+          <AnimatePresence mode="wait">
+            <motion.div key={isLogin ? 'signin-heading' : 'register-heading'} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.2 }}>
+              <h1 className="text-3xl font-black leading-tight tracking-tight text-text-main sm:text-4xl">
+                {isLogin ? 'Welcome Back 👋' : 'Create your account'}
+              </h1>
+              <p className="mx-auto mt-2 max-w-md px-3 text-sm font-medium leading-6 text-text-muted sm:text-base">
+                {isLogin ? 'Sign in to continue managing your finances.' : 'Start managing your finances in one modern workspace.'}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </header>
 
-        <div className="bg-card p-5 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-border shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
-          <div className="flex bg-bg p-1.5 rounded-2xl mb-6 sm:mb-8 border border-border">
+        <section className="auth-card rounded-[28px] border border-border bg-card/90 p-6 shadow-[0_28px_80px_rgba(15,23,42,0.14)] backdrop-blur-2xl sm:p-9">
+          <div className="relative mb-7 grid grid-cols-2 rounded-2xl border border-border bg-bg p-1.5" role="tablist" aria-label="Authentication mode">
+            <motion.span
+              className="absolute bottom-1.5 top-1.5 w-[calc(50%-6px)] rounded-xl bg-primary shadow-lg shadow-primary/20"
+              animate={{ left: isLogin ? 6 : '50%' }}
+              transition={{ type: 'spring', stiffness: 360, damping: 31 }}
+            />
             <button
+              type="button"
+              role="tab"
+              aria-selected={isLogin}
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all text-xs sm:text-sm uppercase tracking-wider ${isLogin ? 'bg-card shadow-sm text-text-main' : 'text-text-muted hover:text-text-main'}`}
+              className={`relative z-10 rounded-xl py-3 text-xs font-black uppercase tracking-wider transition-colors sm:text-sm ${isLogin ? 'text-white' : 'text-text-muted hover:text-text-main'}`}
             >
-              Login
+              Sign In
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={!isLogin}
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all text-xs sm:text-sm uppercase tracking-wider ${!isLogin ? 'bg-card shadow-sm text-text-main' : 'text-text-muted hover:text-text-main'}`}
+              className={`relative z-10 rounded-xl py-3 text-xs font-black uppercase tracking-wider transition-colors sm:text-sm ${!isLogin ? 'text-white' : 'text-text-muted hover:text-text-main'}`}
             >
-              Register
+              Create Account
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <AnimatePresence mode="wait">
               {!isLogin && (
                 <motion.div
@@ -224,20 +218,22 @@ export default function Login({ onLogin }: LoginProps) {
                   exit={{ opacity: 0, height: 0 }}
                   className="space-y-2 overflow-hidden"
                 >
-                  <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-1">
+                  <label htmlFor="auth-name" className="px-1 text-[10px] font-black uppercase tracking-widest text-text-muted">
                     Full Name
                   </label>
-                  <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+                  <div className="group relative">
+                    <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted transition-colors group-focus-within:text-primary">
                       <UserIcon size={18} />
                     </div>
                     <input
+                      id="auth-name"
                       type="text"
                       required={!isLogin}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-bg border border-border rounded-xl pl-12 pr-4 py-3.5 font-medium text-text-main outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all placeholder:text-text-muted/30 text-sm"
-                      placeholder="Full Name"
+                      className="auth-input w-full rounded-2xl border border-border bg-bg py-4 pl-12 pr-4 text-sm font-semibold text-text-main outline-none transition-all placeholder:text-text-muted/50 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/15"
+                      placeholder="Your full name"
+                      autoComplete="name"
                     />
                   </div>
                 </motion.div>
@@ -245,50 +241,54 @@ export default function Login({ onLogin }: LoginProps) {
             </AnimatePresence>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-1">
+              <label htmlFor="auth-email" className="px-1 text-[10px] font-black uppercase tracking-widest text-text-muted">
                 Username or Email
               </label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+              <div className="group relative">
+                <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted transition-colors group-focus-within:text-primary">
                   <Mail size={18} />
                 </div>
                 <input
+                  id="auth-email"
                   type="text"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-bg border border-border rounded-xl pl-12 pr-4 py-3.5 font-medium text-text-main outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all placeholder:text-text-muted/30 text-sm"
+                  className="auth-input w-full rounded-2xl border border-border bg-bg py-4 pl-12 pr-4 text-sm font-semibold text-text-main outline-none transition-all placeholder:text-text-muted/50 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/15"
                   placeholder="Name or name@example.com"
+                  autoComplete="username"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-1">
+              <label htmlFor="auth-password" className="px-1 text-[10px] font-black uppercase tracking-widest text-text-muted">
                 Password
               </label>
-              <div className="relative group/pass">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+              <div className="group relative">
+                <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted transition-colors group-focus-within:text-primary">
                   <Lock size={18} />
                 </div>
                 <input
+                  id="auth-password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-bg border border-border rounded-xl pl-12 pr-4 py-3.5 font-medium text-text-main outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all placeholder:text-text-muted/30 text-sm font-mono"
+                  className="auth-input w-full rounded-2xl border border-border bg-bg py-4 pl-12 pr-4 text-sm font-semibold text-text-main outline-none transition-all placeholder:text-text-muted/50 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/15"
                   placeholder="••••••••"
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
                 />
               </div>
-              <div className="flex items-center gap-2 px-1 mt-2">
+              <div className="mt-2 flex items-center gap-2 px-1">
                 <input
                   type="checkbox"
                   id="showPassword"
                   checked={showPassword}
                   onChange={(e) => setShowPassword(e.target.checked)}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer transition-all"
+                  className="h-4 w-4 cursor-pointer rounded border-border text-primary transition-all focus:ring-primary"
                 />
-                <label htmlFor="showPassword" className="text-[11px] font-bold text-text-muted cursor-pointer select-none uppercase tracking-wide">
+                <label htmlFor="showPassword" className="cursor-pointer select-none text-[11px] font-bold uppercase tracking-wide text-text-muted">
                   Show Password
                 </label>
               </div>
@@ -298,20 +298,21 @@ export default function Login({ onLogin }: LoginProps) {
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-[#FFF1F2] dark:bg-[#452723]/30 border border-[#FCA5A5] text-[#EF4444] text-[11px] font-bold p-4 rounded-xl flex items-center gap-2"
+                role="alert"
+                className="flex items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 p-4 text-[11px] font-bold text-danger"
               >
-                <div className="w-1.5 h-1.5 bg-[#EF4444] rounded-full shrink-0" />
+                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-danger" />
                 {error}
               </motion.div>
             )}
 
             <button
               type="submit"
-              disabled={loading || demoLoading || googleLoading}
-              className="w-full bg-primary text-white py-4.5 rounded-2xl font-extrabold text-sm sm:text-[16px] shadow-lg shadow-primary/20 flex items-center justify-center gap-3 transition-all hover:bg-primary-hover active:scale-95 disabled:opacity-50 mt-4 cursor-pointer"
+              disabled={loading || googleLoading}
+              className="auth-submit mt-3 flex min-h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl px-5 py-4 text-sm font-black text-white shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55 sm:text-[15px]"
             >
               {loading ? (
-                <div className="h-6 w-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <><span className="h-5 w-5 animate-spin rounded-full border-2 border-white/45 border-t-white" aria-hidden="true" /><span>Authenticating...</span></>
               ) : (
                 <>
                   <span className="uppercase tracking-[0.16em] sm:tracking-widest">{isLogin ? 'Login' : 'Begin Journey'}</span>
@@ -321,8 +322,9 @@ export default function Login({ onLogin }: LoginProps) {
             </button>
           </form>
 
+          <AnimatePresence initial={false}>
           {isLogin && (
-            <div className="mt-4 space-y-4">
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-5 space-y-4 overflow-hidden">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-border" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-text-muted opacity-60">or</span>
@@ -330,7 +332,7 @@ export default function Login({ onLogin }: LoginProps) {
               </div>
 
               {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
-                <div className={`w-full rounded-2xl overflow-hidden transition-opacity ${googleLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div className={`auth-google w-full overflow-hidden rounded-2xl border border-border bg-card py-1.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${googleLoading ? 'pointer-events-none opacity-50' : ''}`}>
                   <div ref={googleButtonRef} className="flex min-h-[44px] w-full justify-center" />
                 </div>
               ) : (
@@ -343,31 +345,17 @@ export default function Login({ onLogin }: LoginProps) {
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                disabled={loading || demoLoading || googleLoading}
-                className="w-full bg-bg text-text-main py-4 rounded-2xl font-extrabold text-xs sm:text-sm border border-border flex items-center justify-center gap-3 transition-all hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 cursor-pointer"
-              >
-                {demoLoading ? (
-                  <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <PlayCircle size={20} />
-                    <span className="uppercase tracking-[0.12em] sm:tracking-widest">Continue as Demo User</span>
-                  </>
-                )}
-              </button>
-            </div>
+            </motion.div>
           )}
-        </div>
+          </AnimatePresence>
+        </section>
 
-        <div className="text-center mt-8 sm:mt-12 space-y-4">
-          <p className="text-text-muted font-bold text-[10px] uppercase tracking-[0.2em] opacity-40">
-            Secure • Private • Encrypted
+        <div className="mt-7 text-center">
+          <p className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-text-muted/70">
+            <ShieldCheck size={14} className="text-success" /> Secure • Private • Encrypted
           </p>
         </div>
-      </motion.div>
+      </motion.main>
     </div>
   );
 }

@@ -66,6 +66,11 @@
     overflow-x: hidden;
   }
 
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+  }
+
   *,
   *::before,
   *::after {
@@ -87,6 +92,70 @@
     outline: none !important;
     box-shadow: none !important;
   }
+}
+
+.marketing-shell {
+  --bg-root: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --primary: #6366F1;
+  --primary-light: #A5B4FC;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  color-scheme: light;
+}
+
+.auth-shell {
+  --bg-root: #FAFAFF;
+  --bg-card: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  background-color: var(--bg-root);
+  background-image:
+    radial-gradient(circle at 18% 16%, rgb(99 102 241 / 0.10), transparent 30%),
+    radial-gradient(circle at 82% 82%, rgb(59 130 246 / 0.07), transparent 32%),
+    linear-gradient(180deg, #FFFFFF 0%, var(--bg-root) 48%, #FFFFFF 100%);
+}
+
+.dark .auth-shell {
+  --bg-root: #0F172A;
+  --bg-card: #111827;
+  --text-main: #FFFFFF;
+  --text-muted: #94A3B8;
+  --border: rgb(255 255 255 / 0.08);
+  background-image:
+    radial-gradient(circle at 18% 16%, rgb(99 102 241 / 0.14), transparent 30%),
+    radial-gradient(circle at 82% 82%, rgb(59 130 246 / 0.09), transparent 32%),
+    linear-gradient(180deg, #0F172A 0%, #101827 50%, #0F172A 100%);
+}
+
+.auth-card,
+.auth-input,
+.auth-google {
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, box-shadow 300ms ease, transform 200ms ease;
+}
+
+.auth-submit {
+  background-image: linear-gradient(135deg, var(--primary), #7C3AED);
+}
+
+.auth-logo-glow {
+  position: relative;
+}
+
+.auth-logo-glow::before {
+  position: absolute;
+  z-index: -1;
+  width: 130%;
+  height: 130%;
+  border-radius: 22px;
+  background: rgb(99 102 241 / 0.28);
+  filter: blur(18px);
+  content: '';
 }
 
 @layer utilities {
